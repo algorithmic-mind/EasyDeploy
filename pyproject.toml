@@ -1,0 +1,83 @@
+[project]
+name = "easydeploy-workspace"
+version = "0.1.0"
+description = "EasyDeploy monorepo (uv workspace root)"
+requires-python = ">=3.12"
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["backend", "agent", "cli"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-django>=4.9",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "factory-boy>=3.3",
+    "hypothesis>=6.115",
+    "django-stubs[compatible-mypy]>=5.1",
+    "djangorestframework-stubs[compatible-mypy]>=3.15",
+    "celery-types>=0.22",
+    "types-psutil>=6.1",
+    "bandit>=1.8",
+]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["frontend", "**/migrations/*.py", "docs"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "UP", "B", "S", "SIM", "RUF", "PT", "DJ", "N", "C4", "PIE", "RET", "LOG",
+]
+ignore = [
+    "S603",   # subprocess with argv list is the mandated pattern; shell=True (S602/S604/S605) stays banned
+    "S607",   # binaries are resolved by the executor's minimal PATH
+    "RUF012", # mutable class attributes are idiomatic in DRF/Django Meta classes
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106", "S108", "PT011"]
+"**/conftest.py" = ["S101", "S105", "S106"]
+"backend/easydeploy/settings/*.py" = ["F403", "F405"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["easydeploy", "apps", "easydeploy_agent", "edctl"]
+
+# ---------------------------------------------------------------- mypy (agent + cli: strict)
+[tool.mypy]
+python_version = "3.12"
+platform = "linux"  # the agent, CLI and API only run on Linux servers
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+exclude = ["/tests/", "^backend/", "^frontend/"]
+
+[[tool.mypy.overrides]]
+module = ["psutil.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib -q"
+testpaths = ["agent/tests", "cli/tests", "backend"]
+pythonpath = ["backend"]
+DJANGO_SETTINGS_MODULE = "easydeploy.settings.test"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "host: runs real host operations; only on disposable VMs (EASYDEPLOY_HOST_TESTS=1)",
+]
+filterwarnings = ["ignore::DeprecationWarning:celery.*"]
+
+[tool.coverage.run]
+branch = true
+source = ["backend/apps", "agent/easydeploy_agent", "cli/edctl"]
+omit = ["*/migrations/*", "*/tests/*"]
