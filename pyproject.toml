@@ -42,6 +42,7 @@ ignore = [
     "S607",   # binaries are resolved by the executor's minimal PATH
     "RUF012", # mutable class attributes are idiomatic in DRF/Django Meta classes
     "N818",   # exception names follow the domain (NotFound, Conflict, TaskCancelled)
+    "RUF001", "RUF002", "RUF003",  # Persian text is intentional (bilingual product)
 ]
 
 [tool.ruff.lint.per-file-ignores]

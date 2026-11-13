@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = ["typer>=0.12"]
 
 [project.scripts]
-edctl = "edctl.main:run"
+edctl = "edctl.main:run_cli"
 
 [build-system]
 requires = ["hatchling>=1.25"]
