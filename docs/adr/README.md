@@ -23,5 +23,6 @@
 | [0019](0019-single-admin-rbac-ready.md) | Single admin now, RBAC-ready model | Accepted |
 | [0020](0020-ui-languages-en-fa.md) | UI languages: English and Persian | Accepted |
 | [0021](0021-license-tbd.md) | License (to be decided) | Accepted |
+| [0022](0022-segno-qr-codes.md) | segno for TOTP QR codes | Accepted |
 
 New ADRs: copy the structure (Context, Decision, Consequences), next free number.

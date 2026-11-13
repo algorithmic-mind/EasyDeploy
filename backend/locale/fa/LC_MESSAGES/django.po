@@ -1,0 +1,98 @@
+# Persian translation of EasyDeploy backend messages.
+# Compile with: python scripts/compile_messages.py   (or `manage.py compilemessages` on Linux)
+msgid ""
+msgstr ""
+"Project-Id-Version: EasyDeploy 0.1\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# easydeploy/settings/base.py
+msgid "English"
+msgstr "انگلیسی"
+
+msgid "Persian"
+msgstr "فارسی"
+
+# apps/core
+msgid "The request could not be completed."
+msgstr "درخواست قابل انجام نبود."
+
+msgid "Not found."
+msgstr "یافت نشد."
+
+msgid "The resource is in a conflicting state."
+msgstr "وضعیت این منبع با درخواست در تعارض است."
+
+msgid "You do not have permission to perform this action."
+msgstr "شما اجازهٔ انجام این کار را ندارید."
+
+msgid "Some fields are invalid."
+msgstr "برخی از فیلدها نامعتبر هستند."
+
+msgid "A required service is unavailable."
+msgstr "یکی از سرویس‌های مورد نیاز در دسترس نیست."
+
+msgid "An internal error occurred."
+msgstr "خطای داخلی رخ داد."
+
+msgid "CSRF verification failed. Reload the page."
+msgstr "بررسی CSRF ناموفق بود. صفحه را دوباره بارگذاری کنید."
+
+msgid "The EasyDeploy agent is not reachable."
+msgstr "سرویس Agent ایزی‌دیپلوی در دسترس نیست."
+
+# apps/accounts
+msgid "Invalid username or password."
+msgstr "نام کاربری یا رمز عبور نادرست است."
+
+msgid "Too many failed attempts. Try again later."
+msgstr "تعداد تلاش‌های ناموفق بیش از حد مجاز است. بعداً دوباره تلاش کنید."
+
+msgid "The verification code is invalid or expired."
+msgstr "کد تأیید نامعتبر یا منقضی شده است."
+
+msgid "There is no pending two-factor login. Sign in again."
+msgstr "ورود دومرحله‌ای در انتظاری وجود ندارد. دوباره وارد شوید."
+
+msgid "Confirm your password to continue with this action."
+msgstr "برای ادامهٔ این کار، رمز عبور خود را تأیید کنید."
+
+msgid "Two-factor authentication is required by the panel settings."
+msgstr "طبق تنظیمات پنل، احراز هویت دومرحله‌ای الزامی است."
+
+msgid "This API key is not allowed to perform this action."
+msgstr "این کلید API اجازهٔ انجام این کار را ندارد."
+
+msgid "This password is too common."
+msgstr "این رمز عبور بیش از حد رایج است."
+
+msgid "This password repeats too few characters."
+msgstr "این رمز عبور فقط از چند نویسهٔ تکراری ساخته شده است."
+
+msgid "This password is a keyboard or alphabet sequence."
+msgstr "این رمز عبور یک توالی صفحه‌کلید یا الفبا است."
+
+msgid "Your password cannot be a common password, a sequence or a repetition."
+msgstr "رمز عبور شما نمی‌تواند رایج، توالی یا تکراری باشد."
+
+msgid "Unknown time zone."
+msgstr "منطقهٔ زمانی ناشناخته است."
+
+msgid "Enter a verification code or a recovery code."
+msgstr "کد تأیید یا کد بازیابی را وارد کنید."
+
+msgid "The current password is incorrect."
+msgstr "رمز عبور فعلی نادرست است."
+
+msgid "Select at least one scope."
+msgstr "دست‌کم یک دسترسی انتخاب کنید."
+
+#, python-format
+msgid "Invalid scopes: %(scopes)s"
+msgstr "دسترسی‌های نامعتبر: %(scopes)s"
+
+msgid "Enable two-factor authentication first."
+msgstr "ابتدا احراز هویت دومرحله‌ای را فعال کنید."
