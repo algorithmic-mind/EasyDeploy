@@ -5,9 +5,19 @@ Steps (each idempotent, logged to `/var/log/easydeploy/install.log`): preflight 
 docker → release → users → python → config → redis → database → lego → nginx → systemd → firewall →
 edctl → health → summary.
 
-Modes: `--from-source [path]` (development; uv installs CPython 3.12 + locked deps), `--release-file <tgz>`
-or running `install.sh` from an extracted release (bundled CPython + wheelhouse, `--no-index`).
-Signed online releases and offline bundles: Phase 6.
+Modes:
+* **Bootstrap (one command):** `install.sh` run on its own (no `lib/` next to it) downloads
+  `<base>/latest/download/VERSION` (or uses `--version`), then `<base>/download/v<ver>/easydeploy-<ver>-linux-<arch>.tar.gz`
+  and `SHA256SUMS`, verifies the checksum (fails closed), extracts to `/var/tmp/easydeploy-bootstrap.*` and execs the
+  bundled installer with the same arguments. `<base>` defaults to the GitHub Releases of the repository; override
+  with `--release-url` / `ED_RELEASE_URL` for a mirror with the same layout.
+* `--release-file <tgz>` (needs `SHA256SUMS` next to it) or running `install.sh` from an extracted release
+  (bundled CPython + wheelhouse, `--no-index`).
+* `--from-source [path]` (development; uv installs CPython 3.12 + locked deps).
+
+Releases are published by `.github/workflows/release.yml` on `v*` tags (amd64 + arm64, SHA256SUMS, VERSION) and
+verified by installing them with the one-line command on a fresh runner. Signatures (minisign) and offline bundles:
+Phase 6.
 
 Mirror profiles are data files: `installer/mirrors/{global,ir,custom}.env` (the owner fills `ir.env`).
 

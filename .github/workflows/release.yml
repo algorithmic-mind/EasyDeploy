@@ -1,11 +1,15 @@
 name: Release
 
-# Builds per-architecture tarballs on native runners (§8.5). Signing (minisign), the bundled lego
-# binary and offline bundles are completed in Phase 6.
+# Tag vX.Y.Z[-pre] → build amd64/arm64 tarballs on native runners (§8.5), publish a GitHub Release
+# with SHA256SUMS and a VERSION asset (used by the one-line installer), then install the release
+# on a fresh runner with the one-line command and run the acceptance checks.
+# Signing (minisign), the bundled lego binary and offline bundles are completed in Phase 6.
 on:
   push:
     tags: ["v*"]
-  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -30,4 +34,53 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: easydeploy-${{ matrix.arch }}
-          path: release/*
+          path: release/*.tar.gz
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Checksums and VERSION
+        run: |
+          mkdir dist
+          mv artifacts/*.tar.gz dist/
+          cd dist
+          sha256sum *.tar.gz > SHA256SUMS
+          printf '%s\n' "${GITHUB_REF_NAME#v}" > VERSION
+          cat SHA256SUMS
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Install on a fresh Ubuntu 22.04 / 24.04 / 26.04 server:"
+            echo
+            echo '```bash'
+            echo "curl -fsSL https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/installer/install.sh -o install.sh && sudo bash install.sh"
+            echo '```'
+            echo
+            echo "Pre-release build: integrity is checked with SHA-256; signature verification arrives in Phase 6."
+          } > notes.md
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "EasyDeploy ${GITHUB_REF_NAME#v}" \
+            --latest \
+            --notes-file notes.md
+
+  verify:
+    needs: publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: One-line install from the published release
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/installer/install.sh" -o install.sh
+          sudo ED_RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases" \
+            bash install.sh --yes --no-firewall --skip-docker-install
+      - name: Acceptance checks
+        run: sudo bash scripts/vm-acceptance.sh

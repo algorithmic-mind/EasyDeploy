@@ -6,6 +6,17 @@
 
 Requirements: Ubuntu Server 22.04 / 24.04 / 26.04 (amd64 or arm64), root, ≥ 1 GB RAM, ≥ 10 GB free disk.
 
+One command (latest release from GitHub, SHA-256 verified):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/algorithmic-mind/EasyDeploy/main/installer/install.sh -o install.sh && sudo bash install.sh
+```
+
+Without access to GitHub on the server: download `easydeploy-<ver>-linux-<arch>.tar.gz` and `SHA256SUMS`
+elsewhere, copy them with `install.sh`, then `sudo bash install.sh --release-file easydeploy-<ver>-linux-<arch>.tar.gz`.
+
+From source (development):
+
 ```bash
 cd frontend && npm ci && npm run build && cd ..
 sudo bash installer/install.sh --from-source --yes

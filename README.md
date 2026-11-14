@@ -10,6 +10,23 @@ manage domains, SSL, files, containers, firewall, backups and more — from one 
 
 Requirements: Ubuntu Server 22.04 / 24.04 / 26.04 (amd64 or arm64), root, ≥ 1 GB RAM, ≥ 10 GB free disk.
 
+One command (downloads the latest [release](https://github.com/algorithmic-mind/EasyDeploy/releases),
+verifies its SHA-256 and installs it):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/algorithmic-mind/EasyDeploy/main/installer/install.sh -o install.sh && sudo bash install.sh
+```
+
+Useful options: `--version <ver>`, `--port <port>`, `--username <name>`, `--lang fa`, `--no-firewall`,
+`--release-url <mirror>`; see `sudo bash install.sh --help`.
+
+Offline / restricted network: download `easydeploy-<ver>-linux-<arch>.tar.gz` and `SHA256SUMS` elsewhere,
+copy both to the server, then:
+
+```bash
+sudo bash install.sh --release-file easydeploy-<version>-linux-amd64.tar.gz
+```
+
 From a source checkout (development builds):
 
 ```bash
@@ -17,11 +34,7 @@ cd frontend && npm ci && npm run build && cd ..
 sudo bash installer/install.sh --from-source --yes
 ```
 
-From a release tarball:
-
-```bash
-sudo bash install.sh --release-file easydeploy-<version>-linux-amd64.tar.gz
-```
+> Pre-release: releases are verified with SHA-256 only; minisign signatures arrive in Phase 6.
 
 The installer prints the panel URL (`https://<ip>:<port>/<entrance>`), the admin username and a generated
 password **once**. Recover access with `sudo edctl user-info`, `sudo edctl reset-password`,

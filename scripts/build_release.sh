@@ -45,7 +45,13 @@ rm -rf "$PYDIR"
 echo "==> wheelhouse"
 (cd "$ROOT" && uv export --frozen --no-dev --all-packages --no-emit-workspace --no-hashes \
   --output-file "$STAGE/wheels/requirements.txt")
-"$STAGE/python/bin/python3" -m pip wheel --quiet -r "$STAGE/wheels/requirements.txt" -w "$STAGE/wheels"
+# Build wheels with the bundled interpreter (correct ABI/platform tags) from a throwaway venv,
+# because uv-managed Pythons are marked externally managed.
+BUILDVENV=$(mktemp -d)
+"$STAGE/python/bin/python3" -m venv "$BUILDVENV"
+"$BUILDVENV/bin/pip" install --quiet --upgrade pip wheel
+"$BUILDVENV/bin/pip" wheel --quiet -r "$STAGE/wheels/requirements.txt" -w "$STAGE/wheels"
+rm -rf "$BUILDVENV"
 (cd "$ROOT" && uv build --wheel --package easydeploy-agent --out-dir "$STAGE/wheels" \
   && uv build --wheel --package edctl --out-dir "$STAGE/wheels")
 

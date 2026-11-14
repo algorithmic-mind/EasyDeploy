@@ -78,10 +78,27 @@ Small decisions taken where the spec is silent (§0). Hard-to-reverse ones get a
 | 2026-11-14 | Release layout: `releases/<ver>/{app,frontend,deploy,installer,VERSION,venv→venvs/<ver>}`; units use `/opt/easydeploy/current/venv/bin/...`. ACME webroot `/opt/easydeploy/acme`. | Stable paths across upgrades. |
 | 2026-11-14 | Re-running the installer requires `--reinstall` (keeps DB, secrets, admin password, entrance, port). `upgrade.sh` is a stub until Phase 6. | §8.2 "detect existing installation → offer upgrade". |
 | 2026-11-14 | CSP allows inline *styles* (`style-src 'self' 'unsafe-inline'`); scripts stay strict. | Bootstrap/Vue runtime style attributes. |
+| 2026-11-14 | Releases are hosted on **GitHub Releases** of `algorithmic-mind/EasyDeploy` (replaces the `get.easydeploy.example` placeholder of D1). Layout: `latest/download/VERSION`, `download/v<ver>/easydeploy-<ver>-linux-<arch>.tar.gz`, `SHA256SUMS`. Mirrors must copy that layout (`--release-url`). | Owner chose GitHub; no own domain yet. |
+| 2026-11-14 | One-line install = `install.sh` bootstrap mode: download → SHA-256 check (fail closed) → exec bundled installer. **Deviation from §3.3/§8.2:** no minisign signature yet (Phase 6); accepted for pre-releases and stated in README/release notes. | Owner asked for a one-command install now. |
+| 2026-11-14 | Releases are created as normal (non-prerelease, `--latest`) GitHub releases even for `-alpha` versions, so `latest/download/VERSION` resolves. | GitHub's `latest` ignores prereleases. |
+| 2026-11-14 | Idle RSS is *measured and reported* in Phase 0 acceptance (annotation), not a pass/fail gate; the ≤ 450 MB target is a Phase 6 gate. | §15 Phase 0 says "measured and recorded"; Phase 6 says "≤ 450 MB". |
 
 ---
 
 ## Change log (newest first)
+
+### 2026-11-14 — Session 1, part 4 (Claude Opus 5.5) — GitHub, E2E and one-line install
+- Pushed to https://github.com/algorithmic-mind/EasyDeploy (`main`); branch `release/phase0-acceptance` exists
+  only to trigger `installer-e2e.yml` (can be deleted later).
+- First GitHub runs: CI python ✅, frontend ✅, installer ❌ (shellcheck 0.9 SC2015 in vm-test.sh → fixed).
+  Installer E2E: **install succeeded on Ubuntu 22.04 (77 s) and 24.04 (40 s)**; acceptance failed because
+  `reset-password` ends the session that had passed the entrance (script now re-enters) and RSS was a hard gate
+  (now a reported measurement with per-unit cgroup RSS).
+- `vm-acceptance.sh`: per-check expected/actual codes, GitHub annotations (readable without sign-in), doctor details.
+- One-line install: bootstrap mode in `installer/install.sh` (tested locally with a fake release: good checksum
+  installs, tampered tarball and missing SHA256SUMS are refused), `release.yml` (build amd64/arm64 → publish GitHub
+  Release with SHA256SUMS + VERSION → verify job installs with the one-liner and runs acceptance),
+  `build_release.sh` wheelhouse built from a throwaway venv, mirror profiles point to GitHub Releases, docs updated.
 
 ### 2026-11-14 — Session 1, part 3 (Claude Opus 5.5) — preparing VM / CI acceptance
 - Owner chose **GitHub Actions** for the VM test (no VPS available here; Windows Home has no WSL/Hyper-V).
