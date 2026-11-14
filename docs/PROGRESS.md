@@ -83,6 +83,18 @@ Small decisions taken where the spec is silent (§0). Hard-to-reverse ones get a
 
 ## Change log (newest first)
 
+### 2026-11-14 — Session 1, part 3 (Claude Opus 5.5) — preparing VM / CI acceptance
+- Owner chose **GitHub Actions** for the VM test (no VPS available here; Windows Home has no WSL/Hyper-V).
+- `scripts/vm-acceptance.sh`: on-server Phase 0 checks (units, doctor, TLS health, entrance 404/302, lockout 429,
+  `edctl reset-password` + login, diagnostics task, idle RSS ≤ 450 MB, `--after-reboot` mode).
+- `scripts/vm-test.sh`: works from Git Bash without rsync (tar over ssh), one SSH connection, CRLF cleanup,
+  runs the acceptance script.
+- `edctl reset-password` now clears **all** login locks (IP + username, via a generation counter) and deletes
+  sessions through the session engine (cached_db cache entries too). Tests added.
+- CI hardening: bandit config in `pyproject.toml` (B404/B603 skipped — argv lists are mandated; intended findings
+  annotated `# nosec`), nginx template rendering through `ENVIRON` (mawk), bats negative assertions fixed,
+  `edctl doctor` clock check is a warning, `installer-e2e.yml` runs the acceptance script and records install time.
+
 ### 2026-11-14 — Session 1, part 2 (Claude Opus 5.5)
 - `edctl` (`cli/edctl`): Typer CLI with en/fa messages, `--json`, management commands via `runuser -u easydeploy`,
   transactional `set-port` (nginx -t + rollback + UFW), `doctor` checks (units, socket dirs, DBs, nginx, docker,
@@ -176,9 +188,12 @@ cd frontend && npm install && npm run dev               # terminal 3 → http://
 
 ## Next step
 
-1. **Owner action:** create a GitHub repository, push `main`, and check that `ci.yml` is green; run
-   `installer-e2e.yml` (workflow_dispatch) or `scripts/vm-test.sh root@<disposable-vm>` to complete Phase 0
-   acceptance (record install time and idle RSS here).
+1. **Owner action:** create an empty GitHub repository (private is fine), then
+   `git remote add origin <url> && git push -u origin main`. `ci.yml` runs on push; start
+   **Actions → Installer E2E → Run workflow** manually. Read both results (install time, RSS, acceptance
+   PASS/FAIL lines are in the job logs / step summary) and record them here.
+   Alternative with a VPS: `scripts/vm-test.sh root@<disposable-vm>`, reboot, then
+   `sudo bash /root/easydeploy-src/scripts/vm-acceptance.sh --after-reboot`.
 2. Fix whatever the VM/CI run reveals, then mark 0.13 and the acceptance criteria.
 3. Start **Phase 1 — Host essentials** (§15): Dashboard live metrics + monitoring history (monitor.db collectors,
    ECharts), Files (agent `fs.*` ops, chunked upload, archives with zip-slip protection, Monaco editor), Terminal
