@@ -11,5 +11,7 @@ export const PAGES: Record<string, () => Promise<Component>> = {
   '/logs/audit': () => import('@/modules/logs/pages/AuditLogPage.vue'),
   '/logs/login': () => import('@/modules/logs/pages/AuditLogPage.vue'),
   '/logs/tasks': () => import('@/modules/logs/pages/TaskLogPage.vue'),
+  '/files/manager': () => import('@/modules/files/pages/FileManagerPage.vue'),
+  '/files/recycle-bin': () => import('@/modules/files/pages/RecycleBinPage.vue'),
   '/logs/system': () => import('@/modules/logs/pages/SystemLogsPage.vue'),
 }

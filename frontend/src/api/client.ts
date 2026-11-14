@@ -23,6 +23,34 @@ export type HistoryPoint = S['HistoryPoint']
 export type AuditRow = S['AuditLog']
 export type LoginRow = S['LoginLog']
 
+export interface FileEntry {
+  name: string
+  path: string
+  kind: 'file' | 'dir' | 'symlink' | 'other'
+  size: number
+  mode: string
+  owner: string
+  group: string
+  mtime: number
+  link_target: string | null
+  protected?: boolean
+}
+
+export interface RecycleItem {
+  id: string
+  original_path: string
+  deleted_at: number
+  size: number
+  kind: string
+}
+
+interface FileList {
+  path: string
+  entries: FileEntry[]
+  truncated: boolean
+  protected: boolean
+}
+
 export interface ProcessRow {
   pid: number
   ppid: number
@@ -98,6 +126,49 @@ export const hostApi = {
       action,
     }),
   journal: (query: Query) => http.get<S['JournalResult']>(`${V1}/host/journal`, query),
+}
+
+type Body = Record<string, unknown>
+
+export const filesApi = {
+  list: (path: string, hidden: boolean) => http.get<FileList>(`${V1}/files/list`, { path, hidden }),
+  read: (path: string) => http.get<Record<string, unknown>>(`${V1}/files/content`, { path }),
+  write: (body: {
+    path: string
+    content: string
+    expected_sha256?: string
+    create_only?: boolean
+  }) => http.put<Record<string, unknown>>(`${V1}/files/content`, body),
+  mkdir: (path: string) => http.post<Body>(`${V1}/files/mkdir`, { path }),
+  move: (body: {
+    sources: string[]
+    destination: string
+    rename?: boolean
+    overwrite?: boolean
+    confirm_protected?: boolean
+  }) => http.post<Body>(`${V1}/files/move`, body),
+  remove: (body: { paths: string[]; confirm_protected?: boolean }) =>
+    http.post<Body>(`${V1}/files/delete`, body),
+  chmod: (body: {
+    paths: string[]
+    mode: string
+    recursive?: boolean
+    confirm_protected?: boolean
+  }) => http.post<Body>(`${V1}/files/chmod`, body),
+  recycle: () => http.get<{ items: RecycleItem[] }>(`${V1}/files/recycle`),
+  restore: (ids: string[]) => http.post<Body>(`${V1}/files/recycle/restore`, { ids }),
+  purge: (body: { ids?: string[]; all?: boolean }) =>
+    http.post<Body>(`${V1}/files/recycle/purge`, body),
+  task: (action: string, body: Body) =>
+    http.post<{ task_id: string }>(`${V1}/files/tasks/${action}`, body),
+  createUpload: (body: {
+    directory: string
+    filename: string
+    size: number
+    overwrite?: boolean
+  }) => http.post<S['UploadStatus']>(`${V1}/files/uploads`, body),
+  uploadStatus: (id: string) => http.get<S['UploadStatus']>(`${V1}/files/uploads/${id}`),
+  completeUpload: (id: string) => http.post<Body>(`${V1}/files/uploads/${id}/complete`),
 }
 
 export const logsApi = {

@@ -20,7 +20,7 @@ export default defineConfigWithVueTs(
       // §10.4: no hard-coded UI strings; every text comes from vue-i18n.
       '@intlify/vue-i18n/no-raw-text': [
         'error',
-        { ignorePattern: '^[-#:()&|/.,…%+·•×—–0-9\\s]+$', ignoreText: ['EasyDeploy', 'API', 'TOTP'] },
+        { ignorePattern: '^[-#:()&|/.,…%+·•×—–→0-9\\s]*$', ignoreText: ['EasyDeploy', 'API', 'TOTP'] },
       ],
       '@intlify/vue-i18n/no-missing-keys': 'error',
       '@intlify/vue-i18n/no-unused-keys': 'off',

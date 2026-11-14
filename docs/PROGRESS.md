@@ -42,7 +42,7 @@
 - [x] 1.1 Monitoring: agent `system.metrics`, 60 s collector + downsampling/retention (monitor.db), `/ws/monitor/live/`, history API, live dashboard cards, Host → Monitoring charts (ECharts)
 - [x] 1.2 Processes & services: agent `proc.list|detail|signal`, `service.list|action` (critical units protected), pages
 - [x] 1.3 Logs viewers: audit log, login log, task log, system logs (journald, follow). CSV export of audit log: not yet
-- [ ] 1.4 Files (§9.9): agent `fs.*` mutating ops, recycle bin, chunked resumable upload, download, archives (zip-slip protection), Monaco editor
+- [x] 1.4 Files (§9.9): agent `fs.*` ops (read/write with conflict check, mkdir/move/copy, recycle bin, chmod/chown/symlink, du/search, compress/extract with zip-slip protection, fetch URL), `/v1/files/download`, API with resumable 4 MiB chunked uploads and Task-based long ops, File manager + Recycle bin pages, Monaco editor. Not yet: favorites, folder upload, image preview, zip-on-the-fly folder download (use Compress → Download)
 - [ ] 1.5 Terminal (§9.10): agent `/v1/pty`, `/ws/terminal/`, xterm.js, container exec, snippets, saved SSH hosts (asyncssh)
 - [ ] 1.6 Containers (§9.3): docker SDK ops, containers/images/networks/volumes/registries, compose stacks, live logs/stats
 - [ ] 1.7 Phase 1 acceptance (2 GB upload with pause/resume, zip-slip rejected, root + container shell, compose stack from editor, charts survive restart, audit of every mutation)
@@ -95,6 +95,7 @@ Small decisions taken where the spec is silent (§0). Hard-to-reverse ones get a
 | 2026-11-14 | Django/structlog logs go to **stderr**. | Management commands print results on stdout (edctl parses them). |
 | 2026-11-14 | Frontend pages are registered in `frontend/src/modules/pages.ts` (nav path → lazy component); unregistered nav entries show the phase placeholder. | One place to see what is built. |
 | 2026-11-14 | Critical systemd units: panel units cannot be controlled from the UI (edctl only); nginx/redis/docker/ssh/journald/logind/dbus can be restarted but not stopped/disabled. Processes of panel units, PID 1 and the agent cannot be signalled. | §9.11 "panel-critical units are protected". |
+| 2026-11-14 | Files: recycle bin at `/opt/easydeploy/recycle/<id>/{item,meta.json}`; `NEVER` paths (`/`, `/etc`, `/opt/easydeploy`, …) cannot be deleted/moved; paths under `PROTECTED_ROOTS` need `confirm_protected` (UI asks to type the path). Uploads: API writes chunks to `/opt/easydeploy/tmp/uploads/<id>/NNNNNN.part`, agent `fs.upload_finalize` joins them. Editor saves UTF-8. | §9.9; agent/easydeploy_agent/fs_safety.py |
 | 2026-11-14 | Idle RSS is *measured and reported* in Phase 0 acceptance (annotation), not a pass/fail gate; the ≤ 450 MB target is a Phase 6 gate. | §15 Phase 0 says "measured and recorded"; Phase 6 says "≤ 450 MB". |
 
 ---
