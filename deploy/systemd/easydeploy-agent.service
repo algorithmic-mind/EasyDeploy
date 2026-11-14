@@ -1,0 +1,20 @@
+[Unit]
+Description=EasyDeploy privileged agent
+Documentation=https://get.easydeploy.example/docs
+After=network-online.target docker.service
+Wants=network-online.target
+PartOf=easydeploy.target
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/etc/easydeploy/easydeploy.env
+ExecStart=/opt/easydeploy/current/venv/bin/python -m easydeploy_agent
+Restart=on-failure
+RestartSec=3
+# The agent is the only root component; it still gets a private /tmp.
+PrivateTmp=yes
+LimitNOFILE=65536
+
+[Install]
+WantedBy=easydeploy.target

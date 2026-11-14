@@ -1,0 +1,35 @@
+[Unit]
+Description=EasyDeploy panel API (Django ASGI on Uvicorn)
+After=network-online.target easydeploy-agent.service redis-server.service
+Wants=redis-server.service
+PartOf=easydeploy.target
+
+[Service]
+Type=simple
+User=easydeploy
+Group=easydeploy
+SupplementaryGroups=redis
+WorkingDirectory=/opt/easydeploy/current/app/backend
+Environment=DJANGO_SETTINGS_MODULE=easydeploy.settings.prod
+EnvironmentFile=/etc/easydeploy/easydeploy.env
+ExecStart=/opt/easydeploy/current/venv/bin/uvicorn easydeploy.asgi:application \
+    --uds /run/easydeploy/api/api.sock --workers 2 --no-server-header --no-access-log
+UMask=0007
+Restart=on-failure
+RestartSec=3
+# Hardening (§5.2)
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictSUIDSGID=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+ReadWritePaths=/opt/easydeploy/data /opt/easydeploy/logs /opt/easydeploy/tmp /run/easydeploy/api
+MemoryMax=450M
+
+[Install]
+WantedBy=easydeploy.target

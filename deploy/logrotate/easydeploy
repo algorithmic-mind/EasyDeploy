@@ -1,0 +1,19 @@
+/var/log/easydeploy/*.log {
+    weekly
+    rotate 8
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    su root root
+}
+
+/opt/easydeploy/logs/deploys/*.log {
+    monthly
+    rotate 3
+    compress
+    missingok
+    notifempty
+    su easydeploy easydeploy
+}

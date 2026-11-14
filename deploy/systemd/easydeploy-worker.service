@@ -1,0 +1,38 @@
+[Unit]
+Description=EasyDeploy background worker (Celery + beat)
+After=network-online.target easydeploy-agent.service redis-server.service
+Wants=redis-server.service
+PartOf=easydeploy.target
+
+[Service]
+Type=simple
+User=easydeploy
+Group=easydeploy
+SupplementaryGroups=redis
+WorkingDirectory=/opt/easydeploy/current/app/backend
+Environment=DJANGO_SETTINGS_MODULE=easydeploy.settings.prod
+EnvironmentFile=/etc/easydeploy/easydeploy.env
+# Beat is embedded (-B) on a single node to save memory (§5.2).
+ExecStart=/opt/easydeploy/current/venv/bin/celery -A easydeploy worker -B \
+    -Q default,deploy,backup,monitor --concurrency 2 --without-gossip --without-mingle \
+    -s /opt/easydeploy/data/celerybeat-schedule --loglevel INFO
+UMask=0007
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=60
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictSUIDSGID=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+ReadWritePaths=/opt/easydeploy/data /opt/easydeploy/logs /opt/easydeploy/tmp
+MemoryMax=450M
+
+[Install]
+WantedBy=easydeploy.target

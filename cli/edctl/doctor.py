@@ -40,7 +40,10 @@ def _units() -> list[Check]:
     return checks
 
 
-def _socket(path: str, group: str, mode: int) -> Check:
+def _socket(path: str, dir_group: str, dir_mode: int) -> Check:
+    """The socket must exist; its directory (group + mode) is the access boundary (§5.2)."""
+    import grp
+
     name = f"socket {path}"
     try:
         st = os.stat(path)
@@ -48,15 +51,19 @@ def _socket(path: str, group: str, mode: int) -> Check:
         return Check(name, False, "missing", "edctl restart")
     if not stat.S_ISSOCK(st.st_mode):
         return Check(name, False, "not a socket", "edctl restart")
-    import grp
-
+    dst = os.stat(os.path.dirname(path))
     try:
-        group_name = grp.getgrgid(st.st_gid).gr_name
+        group_name = grp.getgrgid(dst.st_gid).gr_name
     except KeyError:
-        group_name = str(st.st_gid)
-    actual = stat.S_IMODE(st.st_mode)
-    ok = group_name == group and actual == mode
-    return Check(name, ok, f"group={group_name} mode={actual:o}", "edctl restart")
+        group_name = str(dst.st_gid)
+    actual = stat.S_IMODE(dst.st_mode)
+    ok = group_name == dir_group and actual == dir_mode
+    return Check(
+        name,
+        ok,
+        f"dir group={group_name} mode={actual:o}",
+        "systemd-tmpfiles --create /etc/tmpfiles.d/easydeploy.conf && edctl restart",
+    )
 
 
 def _database(path: str) -> Check:
@@ -119,8 +126,8 @@ def _health(p: Paths) -> Check:
 def run_checks(p: Paths) -> list[Check]:
     steps: list[Callable[[], list[Check] | Check]] = [
         _units,
-        lambda: _socket(str(p.run_dir / "agent" / "agent.sock"), "easydeploy", 0o660),
-        lambda: _socket(str(p.run_dir / "api" / "api.sock"), "www-data", 0o660),
+        lambda: _socket(str(p.run_dir / "agent" / "agent.sock"), "easydeploy", 0o750),
+        lambda: _socket(str(p.run_dir / "api" / "api.sock"), "www-data", 0o2750),
         lambda: _database(str(p.root / "data" / "panel.db")),
         lambda: _database(str(p.root / "data" / "monitor.db")),
         _nginx,

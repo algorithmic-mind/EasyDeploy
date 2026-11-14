@@ -21,9 +21,9 @@ def new_entrance(length: int = 12) -> str:
 def listen_lines(port: int, mode: str) -> str:
     lines = []
     if mode in ("ipv4", "dual"):
-        lines.append(f"listen {port} ssl;")
+        lines.append(f"listen {port} ssl http2;")
     if mode in ("ipv6", "dual"):
-        lines.append(f"listen [::]:{port} ssl;")
+        lines.append(f"listen [::]:{port} ssl http2;")
     return "\n    ".join(lines)
 
 

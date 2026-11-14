@@ -114,7 +114,7 @@ def test_set_port_success(root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.exit_code == 0, result.output
     assert read_env(root / "etc" / "easydeploy.env")["ED_PANEL_PORT"] == "30000"
     conf = (root / "nginx" / "panel.conf").read_text(encoding="utf-8")
-    assert "listen 30000 ssl;" in conf
+    assert "listen 30000 ssl http2;" in conf
     assert str(root / "run" / "api" / "api.sock") in conf
     assert ["nginx", "-t"] in fake.calls
     assert ["ufw", "allow", "30000/tcp", "comment", "EasyDeploy panel"] in fake.calls
@@ -148,5 +148,7 @@ def test_update_env_keeps_comments(tmp_path: Path) -> None:
 
 
 def test_listen_modes() -> None:
-    assert edctl_panel.listen_lines(9000, "dual") == "listen 9000 ssl;\n    listen [::]:9000 ssl;"
-    assert edctl_panel.listen_lines(9000, "ipv6") == "listen [::]:9000 ssl;"
+    assert edctl_panel.listen_lines(9000, "dual") == (
+        "listen 9000 ssl http2;\n    listen [::]:9000 ssl http2;"
+    )
+    assert edctl_panel.listen_lines(9000, "ipv6") == "listen [::]:9000 ssl http2;"

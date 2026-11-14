@@ -1,0 +1,7 @@
+[Unit]
+Description=EasyDeploy server control panel
+Wants=easydeploy-agent.service easydeploy-api.service easydeploy-worker.service
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
