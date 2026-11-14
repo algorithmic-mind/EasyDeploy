@@ -2,8 +2,8 @@
 # Steps 15–16 — health check and the final summary (the password is printed once, never logged).
 
 health_check() {
-  local url="https://127.0.0.1:$ED_PANEL_PORT/api/v1/health" i
-  for i in $(seq 1 60); do
+  local url="https://127.0.0.1:$ED_PANEL_PORT/api/v1/health"
+  for _ in $(seq 1 60); do
     if curl -fsS --max-time 3 --cacert "$ED_ETC/ssl/panel/fullchain.pem" "$url" 2>/dev/null | grep -q '"ok"'; then
       ok "panel is healthy"
       touch "$ED_ROOT/.installed"

@@ -11,7 +11,8 @@ nginx_self_signed_cert() {
   local dir=$ED_ETC/ssl/panel
   [[ -s $dir/fullchain.pem && -s $dir/privkey.pem ]] && return 0
   install -d -m 0750 -o root -g root "$dir"
-  local san="IP:127.0.0.1,DNS:localhost,DNS:$(hostname -s)" ip
+  local san ip
+  san="IP:127.0.0.1,DNS:localhost,DNS:$(hostname -s)"
   ip=$(primary_ipv4)
   [[ -n $ip ]] && san+=",IP:$ip"
   has_ipv6 && san+=",IP:::1"

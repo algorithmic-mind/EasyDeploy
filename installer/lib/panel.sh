@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034  # ED_GENERATED_PASSWORD / ED_ENTRANCE are read by summary.sh
 # Steps 5, 7–10 — release files, users & directories, config & secrets, Redis, database, lego.
 
 # ------------------------------------------------------------------ step 5: release
@@ -101,7 +102,8 @@ users_and_dirs() {
 
 # ------------------------------------------------------------------ step 8: config & secrets
 write_secret() {
-  local name=$1 value=$2 file=$ED_ETC/secrets/$1
+  local name=$1 value=$2
+  local file=$ED_ETC/secrets/$name
   [[ -s $file ]] && return 0
   (umask 0137 && printf '%s\n' "$value" >"$file")
   chown root:"$ED_USER" "$file"
@@ -163,8 +165,7 @@ redis_configure() {
   grep -qxF "include $extra" "$conf" || printf '\ninclude %s\n' "$extra" >>"$conf"
   run systemctl enable redis-server
   run systemctl restart redis-server || die "redis-server failed to start with the EasyDeploy config"
-  local i
-  for i in $(seq 1 20); do
+  for _ in $(seq 1 20); do
     [[ -S /run/redis/redis-server.sock ]] && break
     sleep 0.5
   done

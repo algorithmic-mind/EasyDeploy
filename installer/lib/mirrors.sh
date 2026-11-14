@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2034  # values are read by docker.sh and python.sh
 # Step 2 — mirror profiles (§11). Mirror URLs live only in installer/mirrors/<profile>.env.
 
 ED_DOCKER_APT_URL=""
