@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2029  # remote paths are expanded locally on purpose
 # Copy the working tree to a DISPOSABLE Ubuntu VM, install from source, run the acceptance checks (§12).
 #   scripts/vm-test.sh root@203.0.113.10 [extra installer options…]
 # Works from Linux, macOS and Git Bash on Windows (uses rsync when present, tar over ssh otherwise).
 # Never point this at a server you care about: it installs packages and enables UFW.
 set -Eeuo pipefail
-# shellcheck disable=SC2029  # remote paths are expanded locally on purpose
 
 TARGET=${1:?usage: scripts/vm-test.sh user@host [installer options]}
 shift
