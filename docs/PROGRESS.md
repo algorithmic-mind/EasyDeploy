@@ -13,10 +13,10 @@
 
 | Item | Value |
 |---|---|
-| Current phase | **Phase 0 — Foundation**: all code deliverables built and verified locally; VM/CI acceptance pending |
+| Current phase | **Phase 1 — Host essentials** (in progress). Phase 0 accepted on GitHub runners (Ubuntu 22.04 + 24.04). |
 | Last updated | 2026-11-14 |
 | Last agent | Claude Opus 5.5 (Claude Code) |
-| Git | branch `main`, no remote configured yet |
+| Git | https://github.com/algorithmic-mind/EasyDeploy (`main`); first release tag `v0.1.0-alpha.1` |
 | Next step | See "Next step" at the bottom |
 
 ---
@@ -35,14 +35,24 @@
 - [x] 0.10 Installer v0 (`--from-source` + local tarball), deploy files (systemd, nginx, redis, logrotate), uninstall, bats tests, build_release.sh, vm-test.sh
 - [x] 0.11 Docs skeleton (`architecture.md`, `threat-model.md`, `modules/*`, user guide en/fa, README)
 - [x] 0.12 Local verification: lint, type check, tests, frontend build, dev-stack smoke test, browser check (see Verification log)
-- [ ] 0.13 VM acceptance on a disposable Ubuntu 24.04 VM (owner action, or push to GitHub so `installer-e2e.yml` runs)
+- [x] 0.13 VM acceptance via `installer-e2e.yml` on fresh Ubuntu 22.04 and 24.04 runners (all checks pass)
+
+## Phase 1 checklist (§15) — Host essentials
+
+- [x] 1.1 Monitoring: agent `system.metrics`, 60 s collector + downsampling/retention (monitor.db), `/ws/monitor/live/`, history API, live dashboard cards, Host → Monitoring charts (ECharts)
+- [x] 1.2 Processes & services: agent `proc.list|detail|signal`, `service.list|action` (critical units protected), pages
+- [x] 1.3 Logs viewers: audit log, login log, task log, system logs (journald, follow). CSV export of audit log: not yet
+- [ ] 1.4 Files (§9.9): agent `fs.*` mutating ops, recycle bin, chunked resumable upload, download, archives (zip-slip protection), Monaco editor
+- [ ] 1.5 Terminal (§9.10): agent `/v1/pty`, `/ws/terminal/`, xterm.js, container exec, snippets, saved SSH hosts (asyncssh)
+- [ ] 1.6 Containers (§9.3): docker SDK ops, containers/images/networks/volumes/registries, compose stacks, live logs/stats
+- [ ] 1.7 Phase 1 acceptance (2 GB upload with pause/resume, zip-slip rejected, root + container shell, compose stack from editor, charts survive restart, audit of every mutation)
 
 ### Phase 0 acceptance criteria (§15) — status
 
-- [ ] Fresh Ubuntu 24.04 VM: one command installs in < 10 min, prints working URL; login with 2FA; survives reboot — **needs VM** (`scripts/vm-test.sh root@<vm>`)
-- [~] Wrong entrance → 404/drop; 5 failed logins → lockout; `edctl reset-password` works — **verified by automated tests** (`apps/accounts/tests/*`, `cli/tests`), not yet on a VM
+- [x] Fresh Ubuntu 22.04/24.04: install in 40–77 s, health OK, login works (2FA covered by unit tests). Reboot: units are enabled; an actual reboot was not exercised on the runners.
+- [x] Wrong entrance → 404; 5 failed logins → 429 lockout; `edctl reset-password` works — verified on real installs by `scripts/vm-acceptance.sh`
 - [x] Persian switches whole layout to RTL with no untranslated strings — verified in the browser (login, overview, account, mobile 375 px) + i18n completeness test + `no-raw-text`/`no-missing-keys` lint
-- [ ] CI green; idle RSS measured and recorded — **needs a GitHub remote** (workflows written: `ci.yml`, `installer-e2e.yml` measures RSS)
+- [x] CI green; idle RSS recorded: 695 MB (22.04) / 759 MB (24.04): agent ≈65, api ≈230–256, worker ≈390–420, redis ≈10 MB. **Above the 450 MB Phase 6 target** — tuning item for Phase 6 (worker concurrency, uvicorn workers).
 
 ---
 
@@ -81,11 +91,25 @@ Small decisions taken where the spec is silent (§0). Hard-to-reverse ones get a
 | 2026-11-14 | Releases are hosted on **GitHub Releases** of `algorithmic-mind/EasyDeploy` (replaces the `get.easydeploy.example` placeholder of D1). Layout: `latest/download/VERSION`, `download/v<ver>/easydeploy-<ver>-linux-<arch>.tar.gz`, `SHA256SUMS`. Mirrors must copy that layout (`--release-url`). | Owner chose GitHub; no own domain yet. |
 | 2026-11-14 | One-line install = `install.sh` bootstrap mode: download → SHA-256 check (fail closed) → exec bundled installer. **Deviation from §3.3/§8.2:** no minisign signature yet (Phase 6); accepted for pre-releases and stated in README/release notes. | Owner asked for a one-command install now. |
 | 2026-11-14 | Releases are created as normal (non-prerelease, `--latest`) GitHub releases even for `-alpha` versions, so `latest/download/VERSION` resolves. | GitHub's `latest` ignores prereleases. |
+| 2026-11-14 | Celery < 5.7 and kombu < 5.7 pinned in `backend/pyproject.toml`. | kombu 5.7 uses `ZRANGE … BYSCORE` (Redis ≥ 6.2); Ubuntu 22.04 ships Redis 6.0. Revisit when 22.04 support ends. |
+| 2026-11-14 | Django/structlog logs go to **stderr**. | Management commands print results on stdout (edctl parses them). |
+| 2026-11-14 | Frontend pages are registered in `frontend/src/modules/pages.ts` (nav path → lazy component); unregistered nav entries show the phase placeholder. | One place to see what is built. |
+| 2026-11-14 | Critical systemd units: panel units cannot be controlled from the UI (edctl only); nginx/redis/docker/ssh/journald/logind/dbus can be restarted but not stopped/disabled. Processes of panel units, PID 1 and the agent cannot be signalled. | §9.11 "panel-critical units are protected". |
 | 2026-11-14 | Idle RSS is *measured and reported* in Phase 0 acceptance (annotation), not a pass/fail gate; the ≤ 450 MB target is a Phase 6 gate. | §15 Phase 0 says "measured and recorded"; Phase 6 says "≤ 450 MB". |
 
 ---
 
 ## Change log (newest first)
+
+### 2026-11-14 — Session 1, part 5 (Claude Opus 5.5) — Phase 0 accepted, Phase 1 started
+- Owner asked to "start the remaining phases and complete the project"; working phase by phase.
+- Phase 0 acceptance **passed on GitHub runners (22.04 + 24.04)** after fixes: logs to stderr (management command
+  output was polluted → `edctl reset-password` printed a log line), `reset_all_lockouts`, cgroup RSS reading,
+  **Celery/kombu pinned < 5.7** (kombu 5.7 needs Redis ≥ 6.2; Ubuntu 22.04 has 6.0).
+- Tagged `v0.1.0-alpha.1` → `release.yml` builds amd64/arm64 tarballs, publishes the GitHub Release, verifies the one-liner.
+- Phase 1.1 monitoring, 1.2 processes/services, 1.3 log viewers (see checklist).
+- CI annotations: failures of acceptance/bats and service tracebacks are emitted as annotations (readable without
+  GitHub sign-in through the check-runs API).
 
 ### 2026-11-14 — Session 1, part 4 (Claude Opus 5.5) — GitHub, E2E and one-line install
 - Pushed to https://github.com/algorithmic-mind/EasyDeploy (`main`); branch `release/phase0-acceptance` exists
@@ -205,14 +229,9 @@ cd frontend && npm install && npm run dev               # terminal 3 → http://
 
 ## Next step
 
-1. **Owner action:** create an empty GitHub repository (private is fine), then
-   `git remote add origin <url> && git push -u origin main`. `ci.yml` runs on push; start
-   **Actions → Installer E2E → Run workflow** manually. Read both results (install time, RSS, acceptance
-   PASS/FAIL lines are in the job logs / step summary) and record them here.
-   Alternative with a VPS: `scripts/vm-test.sh root@<disposable-vm>`, reboot, then
-   `sudo bash /root/easydeploy-src/scripts/vm-acceptance.sh --after-reboot`.
-2. Fix whatever the VM/CI run reveals, then mark 0.13 and the acceptance criteria.
-3. Start **Phase 1 — Host essentials** (§15): Dashboard live metrics + monitoring history (monitor.db collectors,
-   ECharts), Files (agent `fs.*` ops, chunked upload, archives with zip-slip protection, Monaco editor), Terminal
-   (agent `/v1/pty`, xterm.js, sudo mode), Containers (docker SDK ops, compose stacks), Logs viewers, Processes &
-   Services. Use the Phase N kickoff prompt from `docs/MASTER_PROMPT.md` Appendix C.
+1. Check the `Release` run for `v0.1.0-alpha.1` (build → publish → one-liner verify). If it failed, fix and re-tag
+   (`v0.1.0-alpha.2`).
+2. Continue **Phase 1.4 Files** (§9.9), then 1.5 Terminal, 1.6 Containers, then the Phase 1 acceptance (1.7),
+   extending `scripts/vm-acceptance.sh` and `installer-e2e.yml` for the new checks.
+3. Then Phases 2–6 per §15. Each module: agent ops (+ DryRun/Sandbox tests) → backend app (services, views, audit,
+   tests) → frontend page (registered in `modules/pages.ts`, en+fa strings) → docs/modules → PROGRESS → commit.
