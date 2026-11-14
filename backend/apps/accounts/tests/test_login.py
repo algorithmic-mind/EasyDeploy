@@ -68,13 +68,14 @@ def test_lockout_is_per_username_across_ips(client: APIClient, admin_user: User)
 def test_reset_password_command_unlocks(client: APIClient, admin_user: User) -> None:
     for _ in range(5):
         login(client, "wrong-password-1")
+    assert login(client).status_code == 429
     out = io.StringIO()
     call_command("ed_reset_password", stdout=out)
     new_password = out.getvalue().strip()
     assert len(new_password) >= 16
     assert AuditLog.objects.filter(action="accounts.password_reset").exists()
-    # The username lock is gone; the IP counter still applies, so use a new IP.
-    assert login(client, new_password, REMOTE_ADDR="198.51.100.77").status_code == 200
+    # Both the username and the IP lock are cleared, so the admin can sign in from the same IP.
+    assert login(client, new_password).status_code == 200
 
 
 def test_logout_keeps_entrance(client: APIClient, admin_user: User, set_setting: Any) -> None:
@@ -208,3 +209,9 @@ def test_create_admin_command(db: Any) -> None:
     out = io.StringIO()
     call_command("ed_create_admin", "--if-missing", stdout=out)
     assert "exists" in out.getvalue()
+
+
+def test_reset_password_ends_sessions(auth_client: APIClient) -> None:
+    assert auth_client.get("/api/v1/auth/me").status_code == 200
+    call_command("ed_reset_password", stdout=io.StringIO())
+    assert auth_client.get("/api/v1/auth/me").status_code in {401, 403}

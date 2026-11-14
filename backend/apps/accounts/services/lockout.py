@@ -15,11 +15,14 @@ from apps.accounts.errors import LoginLocked
 from apps.panel.services import get_setting
 
 MAX_DELAY_SECONDS = 2.0
+GENERATION_KEY = "login:generation"
 
 
 def _key(kind: str, value: str) -> str:
+    # The generation lets `reset_all_lockouts` invalidate every counter and lock at once.
+    generation = cache.get(GENERATION_KEY, 0)
     digest = hashlib.sha256(value.lower().encode()).hexdigest()[:32]
-    return f"login:{kind}:{digest}"
+    return f"login:{generation}:{kind}:{digest}"
 
 
 class LoginGuard:
@@ -64,7 +67,9 @@ class LoginGuard:
             cache.delete(_key(f"fail:{kind}", value))
 
 
-def unlock_username(username: str) -> None:
-    """Used by ``edctl reset-password``."""
-    cache.delete(_key("fail:user", username))
-    cache.delete(_key("lock:user", username))
+def reset_all_lockouts() -> None:
+    """Clear every IP and username lock (``edctl reset-password`` recovers a locked-out admin)."""
+    try:
+        cache.incr(GENERATION_KEY)
+    except ValueError:
+        cache.set(GENERATION_KEY, 1, None)

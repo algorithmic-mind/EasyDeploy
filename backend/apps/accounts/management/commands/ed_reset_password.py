@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from importlib import import_module
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
@@ -15,7 +17,7 @@ from apps.accounts.management.commands._admin import (
     generate_password,
     read_password_stdin,
 )
-from apps.accounts.services.lockout import unlock_username
+from apps.accounts.services.lockout import reset_all_lockouts
 from apps.audit.services import record
 
 
@@ -37,7 +39,11 @@ class Command(BaseCommand):
         user.is_active = True
         user.password_changed_at = timezone.now()
         user.save(update_fields=["password", "is_active", "password_changed_at"])
-        unlock_username(user.get_username())
-        Session.objects.all().delete()  # single-admin panel: invalidate every session
+        reset_all_lockouts()
+        # Single-admin panel: end every session. Going through the session engine also clears
+        # the cached copies (SESSION_ENGINE = cached_db in production).
+        store = import_module(settings.SESSION_ENGINE).SessionStore
+        for key in Session.objects.values_list("session_key", flat=True):
+            store(session_key=key).delete()
         record("accounts.password_reset", actor_label="edctl", resource_id=str(user.pk))
         self.stdout.write(password if not opts["password_stdin"] else "updated")
