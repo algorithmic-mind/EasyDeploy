@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "apps.tasks",
     "apps.monitoring",
     "apps.dashboard",
+    "apps.host",
 ]
 
 MIDDLEWARE = [

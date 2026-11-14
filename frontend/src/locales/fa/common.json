@@ -47,6 +47,12 @@
       "minutes": "{n} دقیقه",
       "hours": "{n} ساعت",
       "days": "{n} روز"
-    }
+    },
+    "search": "جست‌وجو",
+    "auto_refresh": "به‌روزرسانی خودکار",
+    "type_to_confirm": "برای تأیید، {text} را تایپ کنید",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "page_of": "صفحهٔ {page} از {pages}"
   }
 }

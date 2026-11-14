@@ -515,6 +515,167 @@ paths:
               schema:
                 $ref: '#/components/schemas/Health'
           description: ''
+  /api/v1/host/journal:
+    get:
+      operationId: host_journal_retrieve
+      description: journald entries (System logs page, service details).
+      parameters:
+      - in: query
+        name: grep
+        schema:
+          type: string
+      - in: query
+        name: lines
+        schema:
+          type: integer
+      - in: query
+        name: priority
+        schema:
+          type: integer
+      - in: query
+        name: since
+        schema:
+          type: string
+        description: YYYY-MM-DD[ HH:MM[:SS]]
+      - in: query
+        name: unit
+        schema:
+          type: string
+      - in: query
+        name: until
+        schema:
+          type: string
+      tags:
+      - host
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalResult'
+          description: ''
+  /api/v1/host/processes:
+    get:
+      operationId: host_processes_retrieve
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+          - cpu
+          - memory
+          - name
+          - pid
+      tags:
+      - host
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessList'
+          description: ''
+  /api/v1/host/processes/{pid}:
+    get:
+      operationId: host_process_detail
+      parameters:
+      - in: path
+        name: pid
+        schema:
+          type: integer
+        required: true
+      tags:
+      - host
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessDetail'
+          description: ''
+  /api/v1/host/processes/{pid}/signal:
+    post:
+      operationId: host_processes_signal_create
+      parameters:
+      - in: path
+        name: pid
+        schema:
+          type: integer
+        required: true
+      tags:
+      - host
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalRequest'
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalResult'
+          description: ''
+  /api/v1/host/services:
+    get:
+      operationId: host_services_retrieve
+      tags:
+      - host
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceList'
+          description: ''
+  /api/v1/host/services/{unit}/action:
+    post:
+      operationId: host_services_action_create
+      parameters:
+      - in: path
+        name: unit
+        schema:
+          type: string
+          pattern: ^[A-Za-z0-9@:._-]{1,255}$
+        required: true
+      tags:
+      - host
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceActionRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceActionResult'
+          description: ''
   /api/v1/monitoring/current:
     get:
       operationId: monitoring_current_retrieve
@@ -747,6 +908,22 @@ paths:
           description: ''
 components:
   schemas:
+    ActionEnum:
+      enum:
+      - start
+      - stop
+      - restart
+      - reload
+      - enable
+      - disable
+      type: string
+      description: |-
+        * `start` - start
+        * `stop` - stop
+        * `restart` - restart
+        * `reload` - reload
+        * `enable` - enable
+        * `disable` - disable
     ApiKey:
       type: object
       properties:
@@ -980,6 +1157,16 @@ components:
       - swap_total
       - swap_used
       - ts
+    JournalResult:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - entries
     LanguageEnum:
       enum:
       - en
@@ -1217,6 +1404,27 @@ components:
           $ref: '#/components/schemas/CalendarEnum'
         theme:
           $ref: '#/components/schemas/ThemeEnum'
+    ProcessDetail:
+      type: object
+      properties:
+        process:
+          type: object
+          additionalProperties: {}
+      required:
+      - process
+    ProcessList:
+      type: object
+      properties:
+        processes:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        total:
+          type: integer
+      required:
+      - processes
+      - total
     RecoveryCodes:
       type: object
       properties:
@@ -1253,6 +1461,65 @@ components:
         recovery_code:
           type: string
           maxLength: 20
+    ServiceActionRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+      required:
+      - action
+    ServiceActionResult:
+      type: object
+      properties:
+        unit:
+          type: string
+        action:
+          type: string
+        active_state:
+          type: string
+      required:
+      - action
+      - active_state
+      - unit
+    ServiceList:
+      type: object
+      properties:
+        units:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - units
+    SignalEnum:
+      enum:
+      - TERM
+      - INT
+      - HUP
+      - KILL
+      type: string
+      description: |-
+        * `TERM` - TERM
+        * `INT` - INT
+        * `HUP` - HUP
+        * `KILL` - KILL
+    SignalRequest:
+      type: object
+      properties:
+        signal:
+          allOf:
+          - $ref: '#/components/schemas/SignalEnum'
+          default: TERM
+    SignalResult:
+      type: object
+      properties:
+        pid:
+          type: integer
+        signal:
+          type: string
+      required:
+      - pid
+      - signal
     SudoRequest:
       type: object
       properties:

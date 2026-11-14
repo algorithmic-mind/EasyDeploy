@@ -1,0 +1,31 @@
+{
+  "logs": {
+    "priority": "Priority",
+    "all": "All",
+    "since": "Since",
+    "follow": "Follow",
+    "time": "Time",
+    "actor": "User",
+    "action": "Action",
+    "resource": "Resource",
+    "ip": "IP",
+    "result": "Result",
+    "user_agent": "Browser",
+    "task": "Task",
+    "duration": "Duration",
+    "results": {
+      "success": "Success",
+      "failure": "Failure"
+    },
+    "priorities": {
+      "0": "Emergency",
+      "1": "Alert",
+      "2": "Critical",
+      "3": "Error",
+      "4": "Warning",
+      "5": "Notice",
+      "6": "Info",
+      "7": "Debug"
+    }
+  }
+}

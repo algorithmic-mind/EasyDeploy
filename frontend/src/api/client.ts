@@ -20,6 +20,41 @@ export type SystemInfo = S['SystemInfo']
 export type ApiKey = S['ApiKey']
 export type ApiKeyCreated = S['ApiKeyCreated']
 export type HistoryPoint = S['HistoryPoint']
+export type AuditRow = S['AuditLog']
+export type LoginRow = S['LoginLog']
+
+export interface ProcessRow {
+  pid: number
+  ppid: number
+  name: string
+  username: string
+  status: string
+  cpu_percent: number
+  memory_rss: number
+  memory_percent: number
+  num_threads: number
+  create_time: number
+  cmdline: string
+}
+
+export interface UnitRow {
+  unit: string
+  description: string
+  load_state: string
+  active_state: string
+  sub_state: string
+  unit_file_state: string
+  protected: boolean
+}
+
+export interface JournalEntry {
+  timestamp: number
+  unit: string
+  identifier: string
+  priority: number
+  message: string
+  pid: number | null
+}
 
 const V1 = '/api/v1'
 
@@ -51,6 +86,23 @@ export const dashboardApi = {
 
 export const monitoringApi = {
   history: (range: string) => http.get<S['MetricsHistory']>(`${V1}/monitoring/history`, { range }),
+}
+
+export const hostApi = {
+  processes: (sort: string) => http.get<S['ProcessList']>(`${V1}/host/processes`, { sort }),
+  signal: (pid: number, signal: string) =>
+    http.post<S['SignalResult']>(`${V1}/host/processes/${pid}/signal`, { signal }),
+  services: () => http.get<S['ServiceList']>(`${V1}/host/services`),
+  serviceAction: (unit: string, action: string) =>
+    http.post<S['ServiceActionResult']>(`${V1}/host/services/${encodeURIComponent(unit)}/action`, {
+      action,
+    }),
+  journal: (query: Query) => http.get<S['JournalResult']>(`${V1}/host/journal`, query),
+}
+
+export const logsApi = {
+  audit: (query: Query) => http.get<S['PaginatedAuditLogList']>(`${V1}/audit/logs`, query),
+  logins: (query: Query) => http.get<S['PaginatedLoginLogList']>(`${V1}/audit/login-logs`, query),
 }
 
 export const tasksApi = {

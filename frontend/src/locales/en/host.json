@@ -1,0 +1,38 @@
+{
+  "host": {
+    "total": "{n} processes",
+    "sort": "Sort by",
+    "sort_cpu": "CPU",
+    "sort_memory": "Memory",
+    "sort_pid": "PID",
+    "sort_name": "Name",
+    "pid": "PID",
+    "name": "Name",
+    "user": "User",
+    "command": "Command",
+    "terminate": "Terminate",
+    "kill": "Kill",
+    "signal_confirm": "Send the signal to {name} (PID {pid})? Unsaved work in that process may be lost.",
+    "signal_sent": "Signal sent to {pid}.",
+    "unit": "Unit",
+    "description": "Description",
+    "state": "State",
+    "startup": "Startup",
+    "protected": "Protected: managed by the panel",
+    "logs": "Logs",
+    "service_confirm": "{action} {unit}?",
+    "service_done": "{unit} updated.",
+    "filter": {
+      "running": "Running",
+      "failed": "Failed",
+      "all": "All"
+    },
+    "actions": {
+      "start": "Start",
+      "stop": "Stop",
+      "restart": "Restart",
+      "enable": "Enable",
+      "disable": "Disable"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "host": {
+    "total": "{n} پردازه",
+    "sort": "مرتب‌سازی",
+    "sort_cpu": "پردازنده",
+    "sort_memory": "حافظه",
+    "sort_pid": "شناسه",
+    "sort_name": "نام",
+    "pid": "شناسه",
+    "name": "نام",
+    "user": "کاربر",
+    "command": "دستور",
+    "terminate": "پایان دادن",
+    "kill": "توقف اجباری",
+    "signal_confirm": "سیگنال به {name} (شناسه {pid}) فرستاده شود؟ کارهای ذخیره‌نشدهٔ این پردازه ممکن است از دست برود.",
+    "signal_sent": "سیگنال به {pid} فرستاده شد.",
+    "unit": "واحد",
+    "description": "توضیح",
+    "state": "وضعیت",
+    "startup": "راه‌اندازی خودکار",
+    "protected": "محافظت‌شده: توسط پنل مدیریت می‌شود",
+    "logs": "گزارش",
+    "service_confirm": "{action} برای {unit}؟",
+    "service_done": "{unit} به‌روز شد.",
+    "filter": {
+      "running": "در حال اجرا",
+      "failed": "ناموفق",
+      "all": "همه"
+    },
+    "actions": {
+      "start": "شروع",
+      "stop": "توقف",
+      "restart": "راه‌اندازی دوباره",
+      "enable": "فعال‌سازی",
+      "disable": "غیرفعال‌سازی"
+    }
+  }
+}

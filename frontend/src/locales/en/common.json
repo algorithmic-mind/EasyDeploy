@@ -47,6 +47,12 @@
       "minutes": "{n}m",
       "hours": "{n}h",
       "days": "{n}d"
-    }
+    },
+    "search": "Search",
+    "auto_refresh": "Auto refresh",
+    "type_to_confirm": "Type {text} to confirm",
+    "previous": "Previous",
+    "next": "Next",
+    "page_of": "Page {page} of {pages}"
   }
 }

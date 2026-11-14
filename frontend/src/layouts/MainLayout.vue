@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import AppSidebar from '@/components/AppSidebar.vue'
 import AppTopbar from '@/components/AppTopbar.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import SudoModal from '@/components/SudoModal.vue'
 import TaskCenter from '@/components/TaskCenter.vue'
 import { useTasksStore } from '@/stores/tasks'
@@ -70,4 +71,5 @@ onBeforeUnmount(() => {
   </div>
   <TaskCenter />
   <SudoModal />
+  <ConfirmDialog />
 </template>

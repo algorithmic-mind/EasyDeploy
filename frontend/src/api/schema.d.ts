@@ -312,6 +312,103 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/host/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description journald entries (System logs page, service details). */
+        get: operations["host_journal_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/host/processes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["host_processes_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/host/processes/{pid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["host_process_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/host/processes/{pid}/signal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["host_processes_signal_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/host/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["host_services_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/host/services/{unit}/action": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["host_services_action_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/monitoring/current": {
         parameters: {
             query?: never;
@@ -463,6 +560,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description * `start` - start
+         *     * `stop` - stop
+         *     * `restart` - restart
+         *     * `reload` - reload
+         *     * `enable` - enable
+         *     * `disable` - disable
+         * @enum {string}
+         */
+        ActionEnum: "start" | "stop" | "restart" | "reload" | "enable" | "disable";
         ApiKey: {
             /** Format: uuid */
             readonly id: string;
@@ -564,6 +671,11 @@ export interface components {
             net_tx_bps: number;
             /** Format: double */
             disk_percent: number;
+        };
+        JournalResult: {
+            entries: {
+                [key: string]: unknown;
+            }[];
         };
         /**
          * @description * `en` - En
@@ -684,6 +796,17 @@ export interface components {
             calendar?: components["schemas"]["CalendarEnum"];
             theme?: components["schemas"]["ThemeEnum"];
         };
+        ProcessDetail: {
+            process: {
+                [key: string]: unknown;
+            };
+        };
+        ProcessList: {
+            processes: {
+                [key: string]: unknown;
+            }[];
+            total: number;
+        };
         RecoveryCodes: {
             recovery_codes: string[];
         };
@@ -703,6 +826,35 @@ export interface components {
         SecondFactorRequest: {
             code?: string;
             recovery_code?: string;
+        };
+        ServiceActionRequest: {
+            action: components["schemas"]["ActionEnum"];
+        };
+        ServiceActionResult: {
+            unit: string;
+            action: string;
+            active_state: string;
+        };
+        ServiceList: {
+            units: {
+                [key: string]: unknown;
+            }[];
+        };
+        /**
+         * @description * `TERM` - TERM
+         *     * `INT` - INT
+         *     * `HUP` - HUP
+         *     * `KILL` - KILL
+         * @enum {string}
+         */
+        SignalEnum: "TERM" | "INT" | "HUP" | "KILL";
+        SignalRequest: {
+            /** @default TERM */
+            signal: components["schemas"]["SignalEnum"];
+        };
+        SignalResult: {
+            pid: number;
+            signal: string;
         };
         SudoRequest: {
             password: string;
@@ -1304,6 +1456,145 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
+                };
+            };
+        };
+    };
+    host_journal_retrieve: {
+        parameters: {
+            query?: {
+                grep?: string;
+                lines?: number;
+                priority?: number;
+                /** @description YYYY-MM-DD[ HH:MM[:SS]] */
+                since?: string;
+                unit?: string;
+                until?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JournalResult"];
+                };
+            };
+        };
+    };
+    host_processes_retrieve: {
+        parameters: {
+            query?: {
+                limit?: number;
+                sort?: "cpu" | "memory" | "name" | "pid";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProcessList"];
+                };
+            };
+        };
+    };
+    host_process_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pid: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProcessDetail"];
+                };
+            };
+        };
+    };
+    host_processes_signal_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pid: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SignalRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignalResult"];
+                };
+            };
+        };
+    };
+    host_services_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceList"];
+                };
+            };
+        };
+    };
+    host_services_action_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                unit: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceActionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceActionResult"];
                 };
             };
         };

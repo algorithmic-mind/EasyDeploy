@@ -16,6 +16,7 @@ api_v1: list[URLPattern | URLResolver] = [
     path("panel/", include("apps.panel.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("monitoring/", include("apps.monitoring.urls")),
+    path("host/", include("apps.host.urls")),
 ]
 
 urlpatterns = [
