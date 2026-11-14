@@ -30,11 +30,11 @@ jobs:
           sudo bash installer/install.sh --from-source --yes --no-firewall --skip-docker-install --port 28443
           echo "INSTALL_SECONDS=$(( $(date +%s) - start ))" >> "$GITHUB_ENV"
       - name: Acceptance checks
-        run: sudo bash scripts/vm-acceptance.sh
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/vm-acceptance.sh
       - name: Reinstall is idempotent
         run: |
           sudo bash installer/install.sh --from-source --yes --no-firewall --skip-docker-install --reinstall
-          sudo bash scripts/vm-acceptance.sh --after-reboot
+          sudo --preserve-env=GITHUB_ACTIONS bash scripts/vm-acceptance.sh --after-reboot
       - name: Summary
         if: always()
         run: |
@@ -46,5 +46,10 @@ jobs:
           sudo edctl doctor || true
           sudo journalctl -u 'easydeploy-*' -u nginx -u redis-server -n 200 --no-pager || true
           sudo tail -n 100 /var/log/easydeploy/install.log || true
+          # Annotations are readable without signing in to GitHub.
+          for unit in easydeploy-agent easydeploy-api easydeploy-worker; do
+            msg=$(sudo journalctl -u "$unit" -n 12 --no-pager -o cat 2>/dev/null | tail -c 3000 | tr '\n' '|')
+            echo "::warning title=$unit::$msg"
+          done
       - name: Uninstall
         run: sudo bash installer/uninstall.sh --purge --yes

@@ -83,4 +83,4 @@ jobs:
           sudo ED_RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases" \
             bash install.sh --yes --no-firewall --skip-docker-install
       - name: Acceptance checks
-        run: sudo bash scripts/vm-acceptance.sh
+        run: sudo --preserve-env=GITHUB_ACTIONS bash scripts/vm-acceptance.sh

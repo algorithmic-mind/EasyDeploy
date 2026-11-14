@@ -73,4 +73,7 @@ jobs:
       - name: bats
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q bats
-          bats installer/tests
+          bats --tap installer/tests | tee bats.out || {
+            grep -A6 '^not ok' bats.out | sed 's/^/::error title=bats::/'
+            exit 1
+          }
