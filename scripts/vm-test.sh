@@ -23,7 +23,11 @@ SSH_OPTS=(-o ControlMaster=auto -o "ControlPath=$SOCK" -o ControlPersist=600)
 if ! ssh "${SSH_OPTS[@]}" -O check "$TARGET" 2>/dev/null; then
   ssh "${SSH_OPTS[@]}" -fN "$TARGET" 2>/dev/null || SSH_OPTS=()
 fi
-cleanup() { [[ ${#SSH_OPTS[@]} -gt 0 ]] && ssh "${SSH_OPTS[@]}" -O exit "$TARGET" 2>/dev/null || true; }
+cleanup() {
+  if [[ ${#SSH_OPTS[@]} -gt 0 ]]; then
+    ssh "${SSH_OPTS[@]}" -O exit "$TARGET" 2>/dev/null || true
+  fi
+}
 trap cleanup EXIT
 
 echo "==> copying the source to $TARGET:$REMOTE_DIR"
