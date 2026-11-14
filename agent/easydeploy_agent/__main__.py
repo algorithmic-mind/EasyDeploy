@@ -51,7 +51,7 @@ def bind_unix_socket(path: Path, group: str) -> socket.socket:
         sock.bind(str(path))
     finally:
         os.umask(old_umask)
-    os.chmod(path, 0o660)
+    os.chmod(path, 0o660)  # nosec B103 - group easydeploy must connect (§5.2)
     try:
         os.chown(path, 0, grp.getgrnam(group).gr_gid)
     except KeyError:

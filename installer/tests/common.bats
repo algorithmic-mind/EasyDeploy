@@ -14,11 +14,10 @@ setup() {
 
 @test "valid_port accepts unprivileged ports and rejects 80/443" {
   valid_port 28443
-  ! valid_port 80
-  ! valid_port 443
-  ! valid_port 1023
-  ! valid_port 70000
-  ! valid_port abc
+  # `! cmd` never fails a bats test (bash ignores it under set -e), so assert explicitly.
+  for bad in 80 443 1023 70000 abc; do
+    if valid_port "$bad"; then echo "accepted $bad"; return 1; fi
+  done
 }
 
 @test "random_string has the requested length and charset" {
@@ -30,7 +29,7 @@ setup() {
 @test "version_ge compares dotted versions" {
   version_ge 27.3.1 24.0
   version_ge 24.0 24.0
-  ! version_ge 20.10.7 24.0
+  if version_ge 20.10.7 24.0; then return 1; fi
 }
 
 @test "parse_args reads options and validates them" {
@@ -74,7 +73,7 @@ setup() {
   ED_ETC=/etc/easydeploy
   out="$BATS_TEST_TMPDIR/panel.conf"
   nginx_render_panel "$out"
-  ! grep -q '@[A-Z_]*@' "$out"
+  if grep -q '@[A-Z_]*@' "$out"; then return 1; fi
   grep -q 'listen 31000 ssl http2;' "$out"
   grep -q 'listen \[::\]:31000 ssl http2;' "$out"
   grep -q 'server unix:/run/easydeploy/api/api.sock;' "$out"

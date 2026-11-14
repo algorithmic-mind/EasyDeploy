@@ -6,7 +6,7 @@ from pathlib import Path
 from easydeploy.log_config import configure_logging
 from easydeploy.settings.base import *
 
-SECRET_KEY = "test-secret-key-not-for-production-0123456789abcdefghijklmnop"
+SECRET_KEY = "test-secret-key-not-for-production-0123456789abcdefghijklmnop"  # nosec B105
 FERNET_KEYS = ["n4bQgYhMfWWaL-qkxRhLJ-6Ewdl-ZuLz0Bb3s7Jz9Ks="]
 
 _TMP = Path(tempfile.mkdtemp(prefix="easydeploy-test-"))

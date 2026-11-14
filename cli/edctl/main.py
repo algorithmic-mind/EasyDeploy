@@ -255,10 +255,11 @@ def doctor(json_out: JsonOpt = False) -> None:
     require_root()
     state["json"] = json_out
     checks = run_checks(paths())
-    problems = [c for c in checks if not c.ok]
+    problems = [c for c in checks if not c.ok and not c.warning]
     lines = [t("doctor_title")]
     for c in checks:
-        lines.append(f"  {'✓' if c.ok else '✗'} {c.name:<34} {c.detail}")
+        mark = "✓" if c.ok else ("!" if c.warning else "✗")
+        lines.append(f"  {mark} {c.name:<34} {c.detail}")
         if not c.ok and c.fix:
             lines.append(f"      {t('fix')}: {c.fix}")
     lines.append(t("doctor_problems", count=len(problems)) if problems else t("doctor_ok"))

@@ -15,7 +15,7 @@ LOGIN_AT_KEY = "ed_login_at"
 LAST_SEEN_KEY = "ed_last_seen"
 SUDO_UNTIL_KEY = "ed_sudo_until"
 PENDING_2FA_KEY = "ed_pending_2fa"
-PENDING_TOTP_SECRET_KEY = "ed_totp_pending_secret"  # noqa: S105  (session key name)
+PENDING_TOTP_SECRET_KEY = "ed_totp_pending_secret"  # noqa: S105  # nosec B105 - session key
 PENDING_2FA_TTL = 300
 
 

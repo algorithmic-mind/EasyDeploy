@@ -1,7 +1,7 @@
 name: Installer E2E
 
-# Installs the panel from source on a fresh runner VM (Ubuntu 22.04 and 24.04) and checks health.
-# Nightly and on release branches (§14). Runners are disposable, so host changes are fine here.
+# Installs the panel from source on fresh runner VMs (Ubuntu 22.04 and 24.04) and runs the Phase 0
+# acceptance checks (scripts/vm-acceptance.sh). Runners are disposable, so host changes are fine here.
 on:
   schedule:
     - cron: "30 2 * * *"
@@ -16,6 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,15 +24,27 @@ jobs:
           node-version: 24
       - name: Build frontend
         run: cd frontend && npm ci --no-audit --no-fund && npm run build
-      - name: Install from source
-        run: sudo bash installer/install.sh --from-source --yes --no-firewall --skip-docker-install --port 28443
-      - name: Doctor
-        run: sudo edctl doctor || (sudo journalctl -u 'easydeploy-*' -n 200 --no-pager; exit 1)
-      - name: Reinstall is idempotent
-        run: sudo bash installer/install.sh --from-source --yes --no-firewall --skip-docker-install --reinstall
-      - name: Idle memory (RSS)
+      - name: Install from source (timed)
         run: |
-          sleep 20
-          ps -o rss=,comm= -u easydeploy,root | grep -E 'uvicorn|celery|python|redis' | awk '{s+=$1} END {printf "idle RSS: %.0f MB\n", s/1024}'
+          start=$(date +%s)
+          sudo bash installer/install.sh --from-source --yes --no-firewall --skip-docker-install --port 28443
+          echo "INSTALL_SECONDS=$(( $(date +%s) - start ))" >> "$GITHUB_ENV"
+      - name: Acceptance checks
+        run: sudo bash scripts/vm-acceptance.sh
+      - name: Reinstall is idempotent
+        run: |
+          sudo bash installer/install.sh --from-source --yes --no-firewall --skip-docker-install --reinstall
+          sudo bash scripts/vm-acceptance.sh --after-reboot
+      - name: Summary
+        if: always()
+        run: |
+          echo "### ${{ matrix.os }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Install time: ${INSTALL_SECONDS:-?} s" >> "$GITHUB_STEP_SUMMARY"
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          sudo edctl doctor || true
+          sudo journalctl -u 'easydeploy-*' -u nginx -u redis-server -n 200 --no-pager || true
+          sudo tail -n 100 /var/log/easydeploy/install.log || true
       - name: Uninstall
         run: sudo bash installer/uninstall.sh --purge --yes

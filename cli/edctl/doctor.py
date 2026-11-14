@@ -23,6 +23,7 @@ class Check:
     ok: bool
     detail: str = ""
     fix: str = ""
+    warning: bool = False  # reported, but does not make `edctl doctor` fail
 
 
 def _units() -> list[Check]:
@@ -103,7 +104,13 @@ def _disk(p: Paths) -> Check:
 def _clock() -> Check:
     result = run(["timedatectl", "show", "-p", "NTPSynchronized", "--value"], timeout=10)
     synced = result.stdout.strip() == "yes"
-    return Check("clock synchronized", synced, result.stdout.strip(), "timedatectl set-ntp true")
+    return Check(
+        "clock synchronized",
+        synced,
+        result.stdout.strip(),
+        "timedatectl set-ntp true",
+        warning=True,
+    )
 
 
 def _health(p: Paths) -> Check:
@@ -116,7 +123,8 @@ def _health(p: Paths) -> Check:
         ctx.check_hostname = False  # self-signed panel cert is issued for the IP / hostname
     url = f"https://127.0.0.1:{port}/api/v1/health"
     try:
-        with urllib.request.urlopen(url, timeout=10, context=ctx) as resp:
+        # Fixed https URL built from the configured port (bandit B310 / ruff S310 do not apply).
+        with urllib.request.urlopen(url, timeout=10, context=ctx) as resp:  # nosec B310
             body = resp.read(200).decode()
             return Check("panel health", resp.status == 200, body)
     except Exception as exc:

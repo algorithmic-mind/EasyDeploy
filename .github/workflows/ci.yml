@@ -33,7 +33,7 @@ jobs:
         run: uv run pytest --cov --cov-report=term-missing:skip-covered
       - name: Security scan
         run: |
-          uv run bandit -q -r agent/easydeploy_agent cli/edctl backend/apps backend/easydeploy -x '*/tests/*'
+          uv run bandit -q -c pyproject.toml -r agent/easydeploy_agent cli/edctl backend/apps backend/easydeploy
           uvx pip-audit --strict --progress-spinner off -r <(uv export --frozen --no-dev --all-packages --no-emit-workspace --no-hashes)
       - name: OpenAPI schema is up to date
         run: |

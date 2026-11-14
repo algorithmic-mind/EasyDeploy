@@ -35,13 +35,17 @@ nginx_listen_lines() {
 nginx_render_panel() {
   local template=$ED_RELEASE_DIR/deploy/nginx/panel.conf.template out=$1 listen
   listen=$(nginx_listen_lines "$ED_PANEL_PORT" "$ED_OPT_LISTEN")
-  awk -v listen="$listen" \
-      -v sock="/run/easydeploy/api/api.sock" \
-      -v front="$ED_ROOT/current/frontend" \
-      -v cert="$ED_ETC/ssl/panel/fullchain.pem" \
-      -v key="$ED_ETC/ssl/panel/privkey.pem" '
-    { gsub(/@LISTEN@/, listen); gsub(/@API_SOCKET@/, sock); gsub(/@FRONTEND_DIR@/, front);
-      gsub(/@SSL_CERT@/, cert); gsub(/@SSL_KEY@/, key); print }' "$template" >"$out"
+  # Values go through ENVIRON: mawk (Ubuntu's default awk) rejects newlines in -v assignments.
+  ED_T_LISTEN="$listen" \
+    ED_T_SOCK="/run/easydeploy/api/api.sock" \
+    ED_T_FRONT="$ED_ROOT/current/frontend" \
+    ED_T_CERT="$ED_ETC/ssl/panel/fullchain.pem" \
+    ED_T_KEY="$ED_ETC/ssl/panel/privkey.pem" \
+    awk '{
+      gsub(/@LISTEN@/, ENVIRON["ED_T_LISTEN"]); gsub(/@API_SOCKET@/, ENVIRON["ED_T_SOCK"])
+      gsub(/@FRONTEND_DIR@/, ENVIRON["ED_T_FRONT"]); gsub(/@SSL_CERT@/, ENVIRON["ED_T_CERT"])
+      gsub(/@SSL_KEY@/, ENVIRON["ED_T_KEY"]); print
+    }' "$template" >"$out"
 }
 
 nginx_setup() {

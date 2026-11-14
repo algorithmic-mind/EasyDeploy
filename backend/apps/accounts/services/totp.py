@@ -96,7 +96,7 @@ def enable(user: User, secret: str) -> list[str]:
 
 @transaction.atomic
 def disable(user: User) -> None:
-    user.totp_secret = ""
+    user.totp_secret = ""  # nosec B105 - clearing the secret
     user.totp_enabled = False
     user.totp_last_counter = 0
     user.save(update_fields=["totp_secret", "totp_enabled", "totp_last_counter"])

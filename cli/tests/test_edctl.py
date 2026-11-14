@@ -152,3 +152,22 @@ def test_listen_modes() -> None:
         "listen 9000 ssl http2;\n    listen [::]:9000 ssl http2;"
     )
     assert edctl_panel.listen_lines(9000, "ipv6") == "listen [::]:9000 ssl http2;"
+
+
+def test_doctor_warnings_do_not_fail(monkeypatch: pytest.MonkeyPatch) -> None:
+    from edctl.doctor import Check
+
+    monkeypatch.setattr(edctl_main, "is_root", lambda: True)
+    monkeypatch.setattr(
+        edctl_main,
+        "run_checks",
+        lambda _p: [Check("svc", True), Check("clock synchronized", False, "no", warning=True)],
+    )
+    result = runner.invoke(edctl_main.app, ["--lang", "en", "doctor"])
+    assert result.exit_code == 0
+    assert "! clock synchronized" in result.output
+
+    monkeypatch.setattr(
+        edctl_main, "run_checks", lambda _p: [Check("service api", False, "failed")]
+    )
+    assert runner.invoke(edctl_main.app, ["doctor"]).exit_code == 1

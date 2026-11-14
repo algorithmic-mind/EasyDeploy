@@ -54,6 +54,13 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["easydeploy", "apps", "easydeploy_agent", "edctl"]
 
+# ---------------------------------------------------------------- bandit
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "frontend"]
+# subprocess with argv lists (shell=False) is the mandated pattern (§5.3); shell use is banned by
+# ruff S602/S604/S605 and scripts/check_no_shell.py.
+skips = ["B404", "B603"]
+
 # ---------------------------------------------------------------- mypy (agent + cli: strict)
 [tool.mypy]
 python_version = "3.12"
