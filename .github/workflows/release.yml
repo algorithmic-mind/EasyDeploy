@@ -1,0 +1,33 @@
+name: Release
+
+# Builds per-architecture tarballs on native runners (§8.5). Signing (minisign), the bundled lego
+# binary and offline bundles are completed in Phase 6.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.13.8"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Build
+        run: bash scripts/build_release.sh "${GITHUB_REF_NAME#v}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: easydeploy-${{ matrix.arch }}
+          path: release/*

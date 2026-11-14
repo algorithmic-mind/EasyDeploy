@@ -74,8 +74,11 @@ def exception_handler(exc: Exception, context: dict[str, Any]) -> Response | Non
         wait = getattr(exc, "wait", None)
         if isinstance(exc, drf_exc.Throttled) and wait is not None:
             headers["Retry-After"] = str(int(wait))
+        message = str(exc.detail)
+        if isinstance(exc, drf_exc.PermissionDenied) and message.startswith("CSRF Failed"):
+            code, message = "auth.csrf_failed", _("CSRF verification failed. Reload the page.")
         # 401 needs WWW-Authenticate; session-only APIs answer 403 like DRF does.
-        return Response(envelope(code, str(exc.detail)), status=exc.status_code, headers=headers)
+        return Response(envelope(code, message), status=exc.status_code, headers=headers)
 
     log.error("unhandled API error", view=str(context.get("view")), exc_info=exc)
     return Response(envelope("internal_error", _("An internal error occurred.")), status=500)

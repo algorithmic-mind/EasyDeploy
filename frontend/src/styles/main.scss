@@ -13,7 +13,9 @@ html[lang='fa'] {
   --bs-font-sans-serif: Vazirmatn, #{$font-family-sans-serif};
 }
 
-// Code, logs, paths and terminals stay LTR inside RTL layouts.
+// Code, logs, paths and terminals stay LTR inside RTL layouts. The ignore markers stop
+// postcss-rtlcss from flipping `direction` in the generated [dir=rtl] rules.
+/* rtl:begin:ignore */
 .ltr-island,
 code,
 pre,
@@ -21,8 +23,8 @@ kbd,
 samp {
   direction: ltr;
   unicode-bidi: isolate;
-  text-align: start;
 }
+/* rtl:end:ignore */
 
 // ------------------------------------------------------------------ layout
 .ed-shell {

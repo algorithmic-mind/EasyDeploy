@@ -22,10 +22,10 @@ const starting = ref(false)
 const rows = computed(() => {
   const i = info.value
   return [
-    { key: 'hostname', value: i?.hostname },
-    { key: 'os', value: i?.os_name },
-    { key: 'kernel', value: i?.kernel },
-    { key: 'arch', value: i?.arch },
+    { key: 'hostname', ltr: true, value: i?.hostname },
+    { key: 'os', ltr: true, value: i?.os_name },
+    { key: 'kernel', ltr: true, value: i?.kernel },
+    { key: 'arch', ltr: true, value: i?.arch },
     {
       key: 'cpu',
       value: i
@@ -96,7 +96,7 @@ onMounted(load)
                 </dt>
                 <dd class="col-sm-8">
                   <span v-if="loading" class="ed-skeleton"></span>
-                  <span v-else class="ltr-island">{{ row.value }}</span>
+                  <span v-else :class="{ 'ltr-island': row.ltr }">{{ row.value }}</span>
                 </dd>
               </template>
             </dl>

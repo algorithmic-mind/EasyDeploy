@@ -50,6 +50,13 @@ def test_validation_error_envelope(client: APIClient) -> None:
     assert "password" in err["details"]
 
 
+def test_login_requires_csrf_token() -> None:
+    strict = APIClient(enforce_csrf_checks=True)
+    resp = strict.post("/api/v1/auth/login", {"username": "a", "password": "b"}, format="json")
+    assert resp.status_code == 403
+    assert resp.json()["error"]["code"] == "auth.csrf_failed"
+
+
 def test_encryption_roundtrip() -> None:
     token = encrypt("s3cret value")
     assert token.startswith("fernet:")
