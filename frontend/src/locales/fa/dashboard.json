@@ -1,0 +1,23 @@
+{
+  "dashboard": {
+    "title": "نمای کلی",
+    "system": "سیستم",
+    "hostname": "نام میزبان",
+    "os": "سیستم‌عامل",
+    "kernel": "هسته",
+    "arch": "معماری",
+    "cpu": "پردازنده",
+    "cpu_value": "{model} · {cores} هسته / {threads} رشته",
+    "memory": "حافظه",
+    "swap": "Swap",
+    "uptime": "مدت روشن بودن",
+    "versions": "نسخه‌ها",
+    "panel_version": "پنل",
+    "agent_version": "Agent",
+    "agent_unavailable": "Agent در دسترس نیست؛ اطلاعات سرور قابل نمایش نیست.",
+    "diagnostics": "عیب‌یابی",
+    "diagnostics_text": "پایگاه‌دادهٔ پنل و Agent ممتاز را بررسی می‌کند. اجرا به‌صورت یک وظیفه با گزارش زنده ثبت می‌شود.",
+    "run_diagnostics": "اجرای عیب‌یابی",
+    "live_metrics_soon": "نمودارهای زنده و پایش در فاز ۱ اضافه می‌شوند."
+  }
+}

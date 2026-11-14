@@ -37,6 +37,7 @@ class TaskSerializer(serializers.ModelSerializer[Task]):
             "result",
             "error",
         ]
+        read_only_fields = fields  # output only; tasks are created by services
 
 
 TaskAccepted = inline_serializer("TaskAccepted", {"task_id": serializers.UUIDField()})

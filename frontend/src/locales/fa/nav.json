@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "overview": {
+      "title": "نمای کلی",
+      "dashboard": "داشبورد"
+    },
+    "app_store": {
+      "title": "فروشگاه برنامه",
+      "browse": "مرور برنامه‌ها",
+      "installed": "نصب‌شده‌ها",
+      "updates": "به‌روزرسانی‌ها"
+    },
+    "projects": {
+      "title": "پروژه‌ها",
+      "list": "پروژه‌ها",
+      "git_credentials": "اعتبارنامه‌های Git"
+    },
+    "websites": {
+      "title": "وب‌سایت‌ها",
+      "sites": "سایت‌ها",
+      "runtimes": "محیط‌های اجرا (PHP)"
+    },
+    "domains": {
+      "title": "دامنه و SSL",
+      "domains": "دامنه‌ها",
+      "dns_accounts": "حساب‌های DNS",
+      "dns_zones": "ناحیه‌های DNS",
+      "certificates": "گواهی‌ها",
+      "acme_accounts": "حساب‌های ACME"
+    },
+    "databases": {
+      "title": "پایگاه‌داده‌ها",
+      "servers": "سرورها",
+      "databases": "پایگاه‌داده‌ها",
+      "users": "کاربران"
+    },
+    "containers": {
+      "title": "کانتینرها",
+      "containers": "کانتینرها",
+      "compose": "استک‌های Compose",
+      "images": "ایمیج‌ها",
+      "networks": "شبکه‌ها",
+      "volumes": "والیوم‌ها",
+      "registries": "رجیستری‌ها",
+      "settings": "تنظیمات Docker"
+    },
+    "files": {
+      "title": "فایل‌ها",
+      "manager": "مدیریت فایل",
+      "recycle_bin": "سطل بازیافت"
+    },
+    "terminal": {
+      "title": "ترمینال",
+      "local": "سرور محلی",
+      "ssh_hosts": "سرورهای SSH ذخیره‌شده",
+      "container_exec": "ترمینال کانتینر",
+      "snippets": "دستورهای آماده"
+    },
+    "host": {
+      "title": "سرور",
+      "monitoring": "پایش",
+      "processes": "پردازه‌ها",
+      "services": "سرویس‌ها",
+      "firewall": "فایروال",
+      "ssh": "SSH",
+      "fail2ban": "Fail2ban",
+      "disks": "دیسک‌ها",
+      "network": "شبکه"
+    },
+    "cronjobs": {
+      "title": "کارهای زمان‌بندی‌شده",
+      "jobs": "کارها",
+      "history": "تاریخچهٔ اجرا"
+    },
+    "backups": {
+      "title": "پشتیبان‌گیری",
+      "records": "نسخه‌های پشتیبان",
+      "accounts": "حساب‌های ذخیره‌سازی",
+      "snapshots": "اسنپ‌شات‌ها"
+    },
+    "logs": {
+      "title": "گزارش‌ها",
+      "audit": "گزارش عملیات",
+      "login": "گزارش ورود",
+      "tasks": "گزارش وظایف",
+      "system": "گزارش‌های سیستم",
+      "websites": "گزارش وب‌سایت‌ها"
+    },
+    "toolbox": {
+      "title": "جعبه‌ابزار",
+      "cleanup": "پاک‌سازی سیستم",
+      "swap": "حافظهٔ Swap",
+      "time": "زمان و NTP",
+      "hostname": "نام میزبان و فایل hosts",
+      "antivirus": "آنتی‌ویروس (ClamAV)",
+      "daemons": "سرویس‌های سفارشی",
+      "scripts": "کتابخانهٔ اسکریپت"
+    },
+    "settings": {
+      "title": "تنظیمات",
+      "general": "عمومی",
+      "security": "امنیت",
+      "notifications": "اعلان‌ها",
+      "network": "شبکه و آینه‌ها",
+      "updates": "به‌روزرسانی",
+      "about": "درباره"
+    },
+    "account": "حساب کاربری",
+    "tasks": "وظایف"
+  }
+}

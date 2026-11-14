@@ -1,0 +1,179 @@
+// Bootstrap compiled from Sass with project variables; postcss-rtlcss adds [dir="rtl"] rules (§10.4).
+@import 'variables';
+@import 'bootstrap/scss/bootstrap';
+
+// ------------------------------------------------------------------ typography
+:root {
+  --ed-sidebar-width: 16rem;
+  --ed-topbar-height: 3.5rem;
+}
+
+html[lang='fa'] {
+  --bs-body-font-family: Vazirmatn, #{$font-family-sans-serif};
+  --bs-font-sans-serif: Vazirmatn, #{$font-family-sans-serif};
+}
+
+// Code, logs, paths and terminals stay LTR inside RTL layouts.
+.ltr-island,
+code,
+pre,
+kbd,
+samp {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+}
+
+// ------------------------------------------------------------------ layout
+.ed-shell {
+  min-height: 100vh;
+}
+
+.ed-sidebar {
+  width: var(--ed-sidebar-width);
+  flex-shrink: 0;
+  background: var(--bs-tertiary-bg);
+  border-inline-end: 1px solid var(--bs-border-color);
+}
+
+.ed-sidebar-desktop {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.ed-brand {
+  height: var(--ed-topbar-height);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ed-nav-section > button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  border: 0;
+  background: none;
+  color: var(--bs-body-color);
+  text-align: start;
+
+  &:hover {
+    background: var(--bs-secondary-bg);
+  }
+
+  .ed-chevron {
+    margin-inline-start: auto;
+    transition: transform 0.15s ease;
+  }
+
+  &[aria-expanded='true'] .ed-chevron {
+    transform: rotate(90deg);
+  }
+}
+
+[dir='rtl'] .ed-nav-section > button[aria-expanded='false'] .ed-chevron {
+  transform: scaleX(-1);
+}
+
+.ed-nav-link {
+  display: block;
+  padding: 0.35rem 1rem;
+  padding-inline-start: 2.6rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.925rem;
+
+  &:hover {
+    color: var(--bs-body-color);
+    background: var(--bs-secondary-bg);
+  }
+
+  &.router-link-exact-active {
+    color: var(--bs-primary);
+    font-weight: 600;
+    background: var(--bs-primary-bg-subtle);
+  }
+}
+
+.ed-topbar {
+  height: var(--ed-topbar-height);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  background: var(--bs-body-bg);
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ed-main {
+  min-width: 0;
+}
+
+.ed-auth-card {
+  width: 100%;
+  max-width: 26rem;
+}
+
+// Icons that imply direction are mirrored in RTL.
+[dir='rtl'] .ed-flip-rtl {
+  transform: scaleX(-1);
+}
+
+// ------------------------------------------------------------------ components
+.ed-log {
+  background: #0b1020;
+  color: #d6deeb;
+  font-family: $font-family-monospace;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  border-radius: $border-radius;
+  padding: 0.75rem;
+  max-height: 60vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+
+  .ed-log-stderr {
+    color: #ff8f8f;
+  }
+}
+
+.ed-qr {
+  width: 12rem;
+  height: 12rem;
+  background: #fff;
+  border-radius: $border-radius;
+  padding: 0.25rem;
+}
+
+.ed-skeleton {
+  display: inline-block;
+  min-width: 6rem;
+  height: 1em;
+  border-radius: 0.25rem;
+  background: linear-gradient(
+    90deg,
+    var(--bs-secondary-bg) 25%,
+    var(--bs-tertiary-bg) 50%,
+    var(--bs-secondary-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: ed-shimmer 1.2s infinite;
+}
+
+@keyframes ed-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-skeleton {
+    animation: none;
+  }
+}

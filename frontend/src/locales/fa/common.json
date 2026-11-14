@@ -1,0 +1,52 @@
+{
+  "common": {
+    "app_name": "ایزی‌دیپلوی",
+    "loading": "در حال بارگذاری…",
+    "save": "ذخیره",
+    "saving": "در حال ذخیره…",
+    "saved": "ذخیره شد",
+    "cancel": "انصراف",
+    "close": "بستن",
+    "confirm": "تأیید",
+    "retry": "تلاش دوباره",
+    "refresh": "به‌روزرسانی",
+    "copy": "کپی",
+    "copied": "در کلیپ‌بورد کپی شد",
+    "back": "بازگشت",
+    "continue": "ادامه",
+    "enabled": "فعال",
+    "disabled": "غیرفعال",
+    "language": "زبان",
+    "theme": "پوسته",
+    "theme_light": "روشن",
+    "theme_dark": "تیره",
+    "theme_system": "مطابق سیستم",
+    "lang_en": "English (انگلیسی)",
+    "lang_fa": "فارسی",
+    "toggle_navigation": "باز و بسته کردن منو",
+    "main_navigation": "منوی اصلی",
+    "skip_to_content": "رفتن به محتوا",
+    "under_construction": "به‌زودی",
+    "coming_in_phase": "این بخش در فاز {phase} نقشهٔ راه ساخته می‌شود.",
+    "empty": "هنوز موردی وجود ندارد.",
+    "error_generic": "مشکلی پیش آمد.",
+    "error_network": "ارتباط با سرور برقرار نشد. اتصال خود را بررسی کنید.",
+    "request_id": "شناسهٔ درخواست: {id}",
+    "not_found_title": "صفحه پیدا نشد",
+    "not_found_text": "صفحه‌ای که به دنبال آن هستید وجود ندارد.",
+    "go_home": "رفتن به نمای کلی",
+    "units": {
+      "b": "{n} بایت",
+      "kb": "{n} کیلوبایت",
+      "mb": "{n} مگابایت",
+      "gb": "{n} گیگابایت",
+      "tb": "{n} ترابایت"
+    },
+    "duration": {
+      "seconds": "{n} ثانیه",
+      "minutes": "{n} دقیقه",
+      "hours": "{n} ساعت",
+      "days": "{n} روز"
+    }
+  }
+}

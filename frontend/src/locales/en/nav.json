@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "overview": {
+      "title": "Overview",
+      "dashboard": "Dashboard"
+    },
+    "app_store": {
+      "title": "App Store",
+      "browse": "Browse",
+      "installed": "Installed",
+      "updates": "Updates"
+    },
+    "projects": {
+      "title": "Projects",
+      "list": "Projects",
+      "git_credentials": "Git credentials"
+    },
+    "websites": {
+      "title": "Websites",
+      "sites": "Sites",
+      "runtimes": "Runtimes (PHP)"
+    },
+    "domains": {
+      "title": "Domains & SSL",
+      "domains": "Domains",
+      "dns_accounts": "DNS accounts",
+      "dns_zones": "DNS zones",
+      "certificates": "Certificates",
+      "acme_accounts": "ACME accounts"
+    },
+    "databases": {
+      "title": "Databases",
+      "servers": "Servers",
+      "databases": "Databases",
+      "users": "Users"
+    },
+    "containers": {
+      "title": "Containers",
+      "containers": "Containers",
+      "compose": "Compose stacks",
+      "images": "Images",
+      "networks": "Networks",
+      "volumes": "Volumes",
+      "registries": "Registries",
+      "settings": "Docker settings"
+    },
+    "files": {
+      "title": "Files",
+      "manager": "File manager",
+      "recycle_bin": "Recycle bin"
+    },
+    "terminal": {
+      "title": "Terminal",
+      "local": "Local host",
+      "ssh_hosts": "Saved SSH hosts",
+      "container_exec": "Container exec",
+      "snippets": "Command snippets"
+    },
+    "host": {
+      "title": "Host",
+      "monitoring": "Monitoring",
+      "processes": "Processes",
+      "services": "Services",
+      "firewall": "Firewall",
+      "ssh": "SSH",
+      "fail2ban": "Fail2ban",
+      "disks": "Disks",
+      "network": "Network"
+    },
+    "cronjobs": {
+      "title": "Cron Jobs",
+      "jobs": "Jobs",
+      "history": "Run history"
+    },
+    "backups": {
+      "title": "Backups",
+      "records": "Backup records",
+      "accounts": "Backup accounts",
+      "snapshots": "Snapshots"
+    },
+    "logs": {
+      "title": "Logs",
+      "audit": "Audit log",
+      "login": "Login log",
+      "tasks": "Task log",
+      "system": "System logs",
+      "websites": "Website logs"
+    },
+    "toolbox": {
+      "title": "Toolbox",
+      "cleanup": "System cleanup",
+      "swap": "Swap",
+      "time": "Time & NTP",
+      "hostname": "Hostname & hosts file",
+      "antivirus": "Antivirus (ClamAV)",
+      "daemons": "Daemons",
+      "scripts": "Script library"
+    },
+    "settings": {
+      "title": "Settings",
+      "general": "General",
+      "security": "Security",
+      "notifications": "Notifications",
+      "network": "Network & Mirrors",
+      "updates": "Updates",
+      "about": "About"
+    },
+    "account": "Account",
+    "tasks": "Tasks"
+  }
+}

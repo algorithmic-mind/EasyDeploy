@@ -1,0 +1,25 @@
+{
+  "tasks": {
+    "center_title": "مرکز وظایف",
+    "open_center": "باز کردن مرکز وظایف",
+    "running_count": "{n} در حال اجرا",
+    "empty": "هنوز وظیفه‌ای وجود ندارد. عملیات طولانی با گزارش زنده اینجا نمایش داده می‌شوند.",
+    "status": {
+      "pending": "در صف",
+      "running": "در حال اجرا",
+      "succeeded": "موفق",
+      "failed": "ناموفق",
+      "cancelled": "لغو شده"
+    },
+    "cancel": "لغو وظیفه",
+    "view_log": "مشاهدهٔ گزارش",
+    "back_to_list": "همهٔ وظایف",
+    "log_empty": "هنوز خروجی‌ای وجود ندارد.",
+    "started": "شروع: {time}",
+    "progress": "{percent}٪",
+    "connection_lost": "اتصال زنده قطع شد؛ در حال اتصال دوباره…",
+    "titles": {
+      "diagnostics": "عیب‌یابی پنل"
+    }
+  }
+}

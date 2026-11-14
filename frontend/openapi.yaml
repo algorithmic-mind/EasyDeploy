@@ -1,0 +1,1400 @@
+openapi: 3.0.3
+info:
+  title: EasyDeploy API
+  version: 0.1.0-dev
+  description: EasyDeploy server control panel API.
+paths:
+  /api/v1/audit/login-logs:
+    get:
+      operationId: audit_login_logs_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: reason
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: since
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: success
+        schema:
+          type: boolean
+      - in: query
+        name: until
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: username
+        schema:
+          type: string
+      tags:
+      - audit
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLoginLogList'
+          description: ''
+  /api/v1/audit/login-logs/{id}:
+    get:
+      operationId: audit_login_logs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this login log.
+        required: true
+      tags:
+      - audit
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginLog'
+          description: ''
+  /api/v1/audit/logs:
+    get:
+      operationId: audit_logs_list
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+      - in: query
+        name: actor
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: module
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: resource_id
+        schema:
+          type: string
+      - in: query
+        name: resource_type
+        schema:
+          type: string
+      - in: query
+        name: result
+        schema:
+          type: string
+          enum:
+          - failure
+          - success
+        description: |-
+          * `success` - Success
+          * `failure` - Failure
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: since
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: until
+        schema:
+          type: string
+          format: date-time
+      tags:
+      - audit
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditLogList'
+          description: ''
+  /api/v1/audit/logs/{id}:
+    get:
+      operationId: audit_logs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this audit log.
+        required: true
+      tags:
+      - audit
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/auth/2fa/disable:
+    post:
+      operationId: auth_2fa_disable_create
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/2fa/enable:
+    post:
+      operationId: auth_2fa_enable_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TotpCodeRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryCodes'
+          description: ''
+  /api/v1/auth/2fa/recovery-codes:
+    post:
+      operationId: auth_2fa_recovery_codes_create
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryCodes'
+          description: ''
+  /api/v1/auth/2fa/setup:
+    post:
+      operationId: auth_2fa_setup_create
+      description: 'Start enrollment: a new secret is kept in the session until confirmed.'
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotpSetup'
+          description: ''
+  /api/v1/auth/api-keys:
+    get:
+      operationId: auth_api_keys_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedApiKeyList'
+          description: ''
+    post:
+      operationId: auth_api_keys_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyCreated'
+          description: ''
+  /api/v1/auth/api-keys/{id}:
+    get:
+      operationId: auth_api_keys_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this api key.
+        required: true
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+          description: ''
+    delete:
+      operationId: auth_api_keys_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this api key.
+        required: true
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '204':
+          description: Revoked
+  /api/v1/auth/csrf:
+    get:
+      operationId: auth_csrf_retrieve
+      description: Sets the CSRF cookie; the SPA calls it once at startup.
+      tags:
+      - auth
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/login:
+    post:
+      operationId: auth_login_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResult'
+          description: ''
+  /api/v1/auth/login/2fa:
+    post:
+      operationId: auth_login_2fa_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecondFactorRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResult'
+          description: ''
+  /api/v1/auth/logout:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/me:
+    get:
+      operationId: auth_me_retrieve
+      tags:
+      - auth
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+    patch:
+      operationId: auth_me_partial_update
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+  /api/v1/auth/password:
+    post:
+      operationId: auth_password_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/sudo:
+    post:
+      operationId: auth_sudo_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SudoRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SudoResult'
+          description: ''
+  /api/v1/dashboard/system-info:
+    get:
+      operationId: dashboard_system_info_retrieve
+      description: Static host information for the Overview page (from agent ``system.info``).
+      tags:
+      - dashboard
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemInfo'
+          description: ''
+  /api/v1/health:
+    get:
+      operationId: health_retrieve
+      description: '``/api/v1/health`` — status only, no auth, answered **only** for
+        localhost (§10.1).'
+      tags:
+      - health
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+          description: ''
+  /api/v1/panel/info:
+    get:
+      operationId: panel_info_retrieve
+      description: Public panel branding for the login page (reachable only after
+        the entrance).
+      tags:
+      - panel
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelInfo'
+          description: ''
+  /api/v1/panel/version:
+    get:
+      operationId: panel_version_retrieve
+      tags:
+      - panel
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PanelVersion'
+          description: ''
+  /api/v1/tasks:
+    get:
+      operationId: tasks_list
+      parameters:
+      - in: query
+        name: kind
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parent
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: resource_id
+        schema:
+          type: string
+      - in: query
+        name: resource_type
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - cancelled
+          - failed
+          - pending
+          - running
+          - succeeded
+        description: |-
+          * `pending` - Pending
+          * `running` - Running
+          * `succeeded` - Succeeded
+          * `failed` - Failed
+          * `cancelled` - Cancelled
+      tags:
+      - tasks
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+  /api/v1/tasks/{id}:
+    get:
+      operationId: tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/v1/tasks/{id}/cancel:
+    post:
+      operationId: tasks_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/v1/tasks/{id}/log:
+    get:
+      operationId: tasks_log_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskLog'
+          description: ''
+  /api/v1/tasks/diagnostics:
+    post:
+      operationId: tasks_diagnostics_create
+      description: Runs a self-check (database, agent) as a Task — exercises the whole
+        task pipeline.
+      tags:
+      - tasks
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAccepted'
+          description: ''
+components:
+  schemas:
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        prefix:
+          type: string
+          readOnly: true
+        scopes: {}
+        ip_allowlist: {}
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_used_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_used_ip:
+          type: string
+          readOnly: true
+          nullable: true
+        revoked_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - last_used_at
+      - last_used_ip
+      - name
+      - prefix
+      - revoked_at
+    ApiKeyCreated:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        prefix:
+          type: string
+          readOnly: true
+        scopes: {}
+        ip_allowlist: {}
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_used_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        last_used_ip:
+          type: string
+          readOnly: true
+          nullable: true
+        revoked_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        key:
+          type: string
+          readOnly: true
+          description: Shown only once.
+      required:
+      - created_at
+      - id
+      - key
+      - last_used_at
+      - last_used_ip
+      - name
+      - prefix
+      - revoked_at
+    ApiKeyRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        scopes: {}
+        ip_allowlist: {}
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - name
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actor:
+          type: string
+          format: uuid
+          nullable: true
+        actor_label:
+          type: string
+          maxLength: 150
+        action:
+          type: string
+          maxLength: 100
+        module:
+          type: string
+          maxLength: 50
+        resource_type:
+          type: string
+          maxLength: 50
+        resource_id:
+          type: string
+          maxLength: 100
+        ip:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          maxLength: 300
+        request_id:
+          type: string
+          maxLength: 64
+        result:
+          $ref: '#/components/schemas/ResultEnum'
+        changes: {}
+        details: {}
+      required:
+      - action
+      - created_at
+      - id
+      - module
+    CalendarEnum:
+      enum:
+      - gregorian
+      - jalali
+      type: string
+      description: |-
+        * `gregorian` - Gregorian
+        * `jalali` - Jalali
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+      - status
+    LanguageEnum:
+      enum:
+      - en
+      - fa
+      type: string
+      description: |-
+        * `en` - En
+        * `fa` - Fa
+    LoginLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        username:
+          type: string
+          maxLength: 150
+        ip:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          maxLength: 300
+        success:
+          type: boolean
+        reason:
+          type: string
+          maxLength: 50
+      required:
+      - created_at
+      - id
+      - success
+      - username
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        password:
+          type: string
+          minLength: 1
+          maxLength: 256
+      required:
+      - password
+      - username
+    LoginResult:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/LoginResultStatusEnum'
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - status
+    LoginResultStatusEnum:
+      enum:
+      - ok
+      - 2fa_required
+      type: string
+      description: |-
+        * `ok` - ok
+        * `2fa_required` - 2fa_required
+    Me:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        sudo_until:
+          type: string
+          format: date-time
+          nullable: true
+        must_enroll_2fa:
+          type: boolean
+      required:
+      - must_enroll_2fa
+      - sudo_until
+      - user
+    PaginatedApiKeyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiKey'
+    PaginatedAuditLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLog'
+    PaginatedLoginLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoginLog'
+    PaginatedTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    PanelInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        default_language:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+      required:
+      - default_language
+      - languages
+      - name
+    PanelVersion:
+      type: object
+      properties:
+        version:
+          type: string
+      required:
+      - version
+    PasswordChangeRequest:
+      type: object
+      properties:
+        current_password:
+          type: string
+          minLength: 1
+          maxLength: 256
+        new_password:
+          type: string
+          minLength: 1
+          maxLength: 256
+      required:
+      - current_password
+      - new_password
+    PatchedUserRequest:
+      type: object
+      properties:
+        language:
+          $ref: '#/components/schemas/LanguageEnum'
+        timezone:
+          type: string
+          minLength: 1
+          maxLength: 64
+        calendar:
+          $ref: '#/components/schemas/CalendarEnum'
+        theme:
+          $ref: '#/components/schemas/ThemeEnum'
+    RecoveryCodes:
+      type: object
+      properties:
+        recovery_codes:
+          type: array
+          items:
+            type: string
+      required:
+      - recovery_codes
+    ResultEnum:
+      enum:
+      - success
+      - failure
+      type: string
+      description: |-
+        * `success` - Success
+        * `failure` - Failure
+    RoleEnum:
+      enum:
+      - admin
+      - operator
+      - viewer
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `operator` - Operator
+        * `viewer` - Viewer
+    SecondFactorRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 10
+        recovery_code:
+          type: string
+          maxLength: 20
+    SudoRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          minLength: 1
+          maxLength: 256
+        code:
+          type: string
+          maxLength: 10
+      required:
+      - password
+    SudoResult:
+      type: object
+      properties:
+        sudo_until:
+          type: string
+          format: date-time
+      required:
+      - sudo_until
+    SystemInfo:
+      type: object
+      properties:
+        hostname:
+          type: string
+        os_name:
+          type: string
+        os_version:
+          type: string
+        kernel:
+          type: string
+        arch:
+          type: string
+        cpu_model:
+          type: string
+        cpu_cores:
+          type: integer
+        cpu_threads:
+          type: integer
+        memory_total:
+          type: integer
+        swap_total:
+          type: integer
+        uptime_seconds:
+          type: integer
+        agent_version:
+          type: string
+        panel_version:
+          type: string
+      required:
+      - agent_version
+      - arch
+      - cpu_cores
+      - cpu_model
+      - cpu_threads
+      - hostname
+      - kernel
+      - memory_total
+      - os_name
+      - os_version
+      - panel_version
+      - swap_total
+      - uptime_seconds
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        title_key:
+          type: string
+          readOnly: true
+        title_params:
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TaskStatusEnum'
+          readOnly: true
+        progress:
+          type: integer
+          readOnly: true
+        progress_message:
+          type: string
+          readOnly: true
+        resource_type:
+          type: string
+          readOnly: true
+        resource_id:
+          type: string
+          readOnly: true
+        parent:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        finished_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        result:
+          readOnly: true
+          nullable: true
+        error:
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - created_by
+      - error
+      - finished_at
+      - id
+      - kind
+      - parent
+      - progress
+      - progress_message
+      - resource_id
+      - resource_type
+      - result
+      - started_at
+      - status
+      - title_key
+      - title_params
+    TaskAccepted:
+      type: object
+      properties:
+        task_id:
+          type: string
+          format: uuid
+      required:
+      - task_id
+    TaskLog:
+      type: object
+      properties:
+        lines:
+          type: array
+          items:
+            type: string
+      required:
+      - lines
+    TaskStatusEnum:
+      enum:
+      - pending
+      - running
+      - succeeded
+      - failed
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `running` - Running
+        * `succeeded` - Succeeded
+        * `failed` - Failed
+        * `cancelled` - Cancelled
+    ThemeEnum:
+      enum:
+      - light
+      - dark
+      - system
+      type: string
+      description: |-
+        * `light` - Light
+        * `dark` - Dark
+        * `system` - System
+    TotpCodeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 10
+      required:
+      - code
+    TotpSetup:
+      type: object
+      properties:
+        secret:
+          type: string
+        otpauth_uri:
+          type: string
+        qr_svg:
+          type: string
+          description: SVG data URI of the QR code
+      required:
+      - otpauth_uri
+      - qr_svg
+      - secret
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email address
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        language:
+          $ref: '#/components/schemas/LanguageEnum'
+        timezone:
+          type: string
+          maxLength: 64
+        calendar:
+          $ref: '#/components/schemas/CalendarEnum'
+        theme:
+          $ref: '#/components/schemas/ThemeEnum'
+        totp_enabled:
+          type: boolean
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - email
+      - id
+      - last_login
+      - role
+      - totp_enabled
+      - username
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: ed_session

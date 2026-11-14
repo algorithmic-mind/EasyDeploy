@@ -1,0 +1,52 @@
+{
+  "common": {
+    "app_name": "EasyDeploy",
+    "loading": "Loading…",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "copy": "Copy",
+    "copied": "Copied to clipboard",
+    "back": "Back",
+    "continue": "Continue",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "language": "Language",
+    "theme": "Theme",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System",
+    "lang_en": "English",
+    "lang_fa": "Persian (فارسی)",
+    "toggle_navigation": "Toggle navigation",
+    "main_navigation": "Main navigation",
+    "skip_to_content": "Skip to content",
+    "under_construction": "Coming soon",
+    "coming_in_phase": "This section is delivered in phase {phase} of the roadmap.",
+    "empty": "Nothing here yet.",
+    "error_generic": "Something went wrong.",
+    "error_network": "Cannot reach the server. Check your connection.",
+    "request_id": "Request ID: {id}",
+    "not_found_title": "Page not found",
+    "not_found_text": "The page you are looking for does not exist.",
+    "go_home": "Go to overview",
+    "units": {
+      "b": "{n} B",
+      "kb": "{n} KB",
+      "mb": "{n} MB",
+      "gb": "{n} GB",
+      "tb": "{n} TB"
+    },
+    "duration": {
+      "seconds": "{n}s",
+      "minutes": "{n}m",
+      "hours": "{n}h",
+      "days": "{n}d"
+    }
+  }
+}

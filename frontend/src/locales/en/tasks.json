@@ -1,0 +1,25 @@
+{
+  "tasks": {
+    "center_title": "Task center",
+    "open_center": "Open task center",
+    "running_count": "{n} running",
+    "empty": "No tasks yet. Long operations appear here with live logs.",
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "cancel": "Cancel task",
+    "view_log": "View log",
+    "back_to_list": "All tasks",
+    "log_empty": "No output yet.",
+    "started": "Started {time}",
+    "progress": "{percent}%",
+    "connection_lost": "Live connection lost; reconnecting…",
+    "titles": {
+      "diagnostics": "Panel diagnostics"
+    }
+  }
+}

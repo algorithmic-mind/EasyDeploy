@@ -1,0 +1,23 @@
+{
+  "dashboard": {
+    "title": "Overview",
+    "system": "System",
+    "hostname": "Hostname",
+    "os": "Operating system",
+    "kernel": "Kernel",
+    "arch": "Architecture",
+    "cpu": "CPU",
+    "cpu_value": "{model} · {cores} cores / {threads} threads",
+    "memory": "Memory",
+    "swap": "Swap",
+    "uptime": "Uptime",
+    "versions": "Versions",
+    "panel_version": "Panel",
+    "agent_version": "Agent",
+    "agent_unavailable": "The agent is not reachable, so host information is unavailable.",
+    "diagnostics": "Diagnostics",
+    "diagnostics_text": "Check the panel database and the privileged agent. The run is recorded as a task with a live log.",
+    "run_diagnostics": "Run diagnostics",
+    "live_metrics_soon": "Live charts and monitoring arrive in phase 1."
+  }
+}
