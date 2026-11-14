@@ -19,6 +19,7 @@ export type PanelInfo = S['PanelInfo']
 export type SystemInfo = S['SystemInfo']
 export type ApiKey = S['ApiKey']
 export type ApiKeyCreated = S['ApiKeyCreated']
+export type HistoryPoint = S['HistoryPoint']
 
 const V1 = '/api/v1'
 
@@ -46,6 +47,10 @@ export const panelApi = {
 
 export const dashboardApi = {
   systemInfo: () => http.get<SystemInfo>(`${V1}/dashboard/system-info`),
+}
+
+export const monitoringApi = {
+  history: (range: string) => http.get<S['MetricsHistory']>(`${V1}/monitoring/history`, { range }),
 }
 
 export const tasksApi = {

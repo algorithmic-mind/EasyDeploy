@@ -1,0 +1,24 @@
+{
+  "monitoring": {
+    "cpu": "CPU",
+    "load": "Load average",
+    "memory": "Memory",
+    "swap": "Swap",
+    "network": "Network",
+    "disk_io": "Disk I/O",
+    "disk_usage": "Disk",
+    "disks": "Disks",
+    "read": "Read",
+    "write": "Write",
+    "received": "Received",
+    "sent": "Sent",
+    "usage": "Usage",
+    "top_processes": "Top processes",
+    "process": "Process",
+    "user": "User",
+    "range": "Time range",
+    "ranges": { "1h": "1 hour", "24h": "24 hours", "7d": "7 days", "30d": "30 days" },
+    "no_data": "No history yet",
+    "no_data_text": "A sample is stored every minute; charts appear shortly after installation."
+  }
+}

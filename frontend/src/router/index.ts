@@ -4,6 +4,7 @@ import { onUnauthorized } from '@/api/http'
 import PlaceholderPage from '@/components/PlaceholderPage.vue'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
+import { PAGES } from '@/modules/pages'
 import { NAVIGATION } from '@/navigation'
 import { useAuthStore } from '@/stores/auth'
 
@@ -21,7 +22,7 @@ const sectionRoutes: RouteRecordRaw[] = NAVIGATION.flatMap((s) =>
     .map((p) => ({
       path: p.path.slice(1),
       name: `${s.key}.${p.key}`,
-      component: PlaceholderPage,
+      component: PAGES[p.path] ?? PlaceholderPage,
       meta: { titleKey: `nav.${s.key}.${p.key}`, phase: p.phase },
     })),
 )

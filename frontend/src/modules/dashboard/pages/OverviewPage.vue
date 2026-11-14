@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { dashboardApi, tasksApi, type SystemInfo } from '@/api/client'
+import LiveMetricsPanel from '@/modules/dashboard/components/LiveMetricsPanel.vue'
 import { useApiError } from '@/composables/useApiError'
 import { useToast } from '@/composables/useToast'
 import { useTasksStore } from '@/stores/tasks'
@@ -78,6 +79,8 @@ onMounted(load)
       </button>
     </div>
 
+    <LiveMetricsPanel class="mb-3" />
+
     <div class="row g-3">
       <div class="col-12 col-xl-8">
         <div class="card h-100">
@@ -132,9 +135,9 @@ onMounted(load)
             </button>
           </div>
         </div>
-        <p class="small text-body-secondary mb-0">
-          <i class="bi bi-graph-up" aria-hidden="true"></i> {{ t('dashboard.live_metrics_soon') }}
-        </p>
+        <router-link to="/host/monitoring" class="small">
+          <i class="bi bi-graph-up" aria-hidden="true"></i> {{ t('dashboard.history_link') }}
+        </router-link>
       </div>
     </div>
   </div>

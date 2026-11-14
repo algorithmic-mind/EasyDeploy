@@ -18,6 +18,6 @@
     "diagnostics": "Diagnostics",
     "diagnostics_text": "Check the panel database and the privileged agent. The run is recorded as a task with a live log.",
     "run_diagnostics": "Run diagnostics",
-    "live_metrics_soon": "Live charts and monitoring arrive in phase 1."
+    "history_link": "Metric history"
   }
 }
