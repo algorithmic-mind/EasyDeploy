@@ -145,6 +145,34 @@ class AgentClient:
             raise AgentUnavailable(details={"reason": type(exc).__name__}) from exc
         raise AgentUnavailable(details={"reason": "stream_ended_without_result"})
 
+    def download(self, path: str, *, actor: str | None = None) -> tuple[Iterator[bytes], int]:
+        """Stream a file's bytes from the agent; returns ``(chunks, size)``."""
+        client = self._client(None)
+        try:
+            request = client.build_request(
+                "GET",
+                "/v1/files/download",
+                params={"path": path},
+                headers=self._headers(actor, False),
+            )
+            resp = client.send(request, stream=True)
+        except httpx.HTTPError as exc:
+            client.close()
+            raise AgentUnavailable(details={"reason": type(exc).__name__}) from exc
+        if resp.status_code != 200:
+            resp.read()
+            client.close()
+            raise AgentError.from_body(resp.json(), resp.status_code)
+
+        def chunks() -> Iterator[bytes]:
+            try:
+                yield from resp.iter_bytes(256 * 1024)
+            finally:
+                resp.close()
+                client.close()
+
+        return chunks(), int(resp.headers.get("content-length", "0"))
+
     def health(self) -> bool:
         try:
             with self._client(5.0) as client:
@@ -236,6 +264,7 @@ class FakeAgent:
             "system.metrics": _fake_metrics,
         }
         self.available = True
+        self.files: dict[str, bytes] = {}  # served by download()
 
     def call(
         self,
@@ -267,6 +296,13 @@ class FakeAgent:
     ) -> dict[str, Any]:
         on_event({"type": "log", "stream": "stdout", "line": f"[fake] {op}"})
         return self.call(op, params, actor=actor, sudo=sudo)
+
+    def download(self, path: str, *, actor: str | None = None) -> tuple[Iterator[bytes], int]:
+        self.calls.append(("fs.download", {"path": path}, actor, False))
+        data = self.files.get(path)
+        if data is None:
+            raise AgentError("Path does not exist", code="fs.not_found", status_code=404)
+        return iter([data]), len(data)
 
     def health(self) -> bool:
         return self.available

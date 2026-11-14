@@ -41,6 +41,7 @@ EASYDEPLOY = {
     **EASYDEPLOY,
     "AGENT_URL": CFG.agent_url or "http://127.0.0.1:7801",
     "TASK_LOG_DIR": VAR_DIR / "logs" / "tasks",
+    "UPLOAD_DIR": VAR_DIR / "tmp" / "uploads",
     "FRONTEND_DIR": BASE_DIR.parent / "frontend" / "dist",
     "DATA_DIR": VAR_DIR,
     # Shared with `python -m easydeploy_agent --dev` (run from the repo root).

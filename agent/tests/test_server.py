@@ -116,3 +116,20 @@ def test_sudo_token_expiry_and_tamper() -> None:
     assert not verify_sudo_token(TOKEN, token[:-1] + "0", "u", now=1001)
     assert not verify_sudo_token("x" * 48, token, "u", now=1001)
     assert not verify_sudo_token(TOKEN, "garbage", "u", now=1001)
+
+
+def test_download_streams_file(
+    client: TestClient, auth_headers: dict[str, str], sandbox: SandboxExecutor
+) -> None:
+    sandbox.write_text("/srv/data/big.txt", "x" * 300_000)
+    assert client.get("/v1/files/download", params={"path": "/srv/data/big.txt"}).status_code == 401
+    resp = client.get(
+        "/v1/files/download", params={"path": "/srv/data/big.txt"}, headers=auth_headers
+    )
+    assert resp.status_code == 200
+    assert resp.headers["content-length"] == "300000"
+    assert resp.content == b"x" * 300_000
+    missing = client.get("/v1/files/download", params={"path": "/nope"}, headers=auth_headers)
+    assert missing.status_code == 404
+    folder = client.get("/v1/files/download", params={"path": "/srv"}, headers=auth_headers)
+    assert folder.json()["error"]["code"] == "fs.not_a_file"

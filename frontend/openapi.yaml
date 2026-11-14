@@ -501,6 +501,414 @@ paths:
               schema:
                 $ref: '#/components/schemas/SystemInfo'
           description: ''
+  /api/v1/files/chmod:
+    post:
+      operationId: files_chmod_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChmodRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/chown:
+    post:
+      operationId: files_chown_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChownRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/content:
+    get:
+      operationId: files_content_retrieve
+      parameters:
+      - in: query
+        name: path
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+    put:
+      operationId: files_content_update
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/delete:
+    post:
+      operationId: files_delete_create
+      description: Move to the recycle bin (restorable).
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/download:
+    get:
+      operationId: files_download_retrieve
+      parameters:
+      - in: query
+        name: path
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/v1/files/list:
+    get:
+      operationId: files_list_retrieve
+      parameters:
+      - in: query
+        name: hidden
+        schema:
+          type: boolean
+      - in: query
+        name: path
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/mkdir:
+    post:
+      operationId: files_mkdir_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PathRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/move:
+    post:
+      operationId: files_move_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/recycle:
+    get:
+      operationId: files_recycle_retrieve
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/recycle/purge:
+    post:
+      operationId: files_recycle_purge_create
+      description: 'Permanent deletion: sudo mode (§9.9).'
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecycleIdsRequest'
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/recycle/restore:
+    post:
+      operationId: files_recycle_restore_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecycleIdsRequest'
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/symlink:
+    post:
+      operationId: files_symlink_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SymlinkRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
+  /api/v1/files/tasks/{action}:
+    post:
+      operationId: files_tasks_create
+      description: Starts a long file operation as a Task and returns 202 {task_id}.
+      parameters:
+      - in: path
+        name: action
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesTaskAccepted'
+          description: ''
+  /api/v1/files/uploads:
+    post:
+      operationId: files_uploads_create
+      tags:
+      - files
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadCreateRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadStatus'
+          description: ''
+  /api/v1/files/uploads/{upload_id}:
+    get:
+      operationId: files_uploads_retrieve
+      parameters:
+      - in: path
+        name: upload_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadStatus'
+          description: ''
+    delete:
+      operationId: files_uploads_destroy
+      parameters:
+      - in: path
+        name: upload_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/files/uploads/{upload_id}/chunks/{index}:
+    put:
+      operationId: files_uploads_chunks_update
+      parameters:
+      - in: header
+        name: X-Chunk-SHA256
+        schema:
+          type: string
+      - in: path
+        name: index
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: upload_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - files
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/files/uploads/{upload_id}/complete:
+    post:
+      operationId: files_uploads_complete_create
+      parameters:
+      - in: path
+        name: upload_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - files
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResult'
+          description: ''
   /api/v1/health:
     get:
       operationId: health_retrieve
@@ -1090,6 +1498,79 @@ components:
       description: |-
         * `gregorian` - Gregorian
         * `jalali` - Jalali
+    ChmodRequest:
+      type: object
+      properties:
+        paths:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 4096
+          maxItems: 1000
+          minItems: 1
+        mode:
+          type: string
+          minLength: 1
+          pattern: ^[0-7]{3,4}$
+        recursive:
+          type: boolean
+          default: false
+        confirm_protected:
+          type: boolean
+          default: false
+      required:
+      - mode
+      - paths
+    ChownRequest:
+      type: object
+      properties:
+        paths:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 4096
+          maxItems: 1000
+          minItems: 1
+        user:
+          type: string
+          minLength: 1
+          pattern: ^[a-z_][a-z0-9_-]{0,31}$
+        group:
+          type: string
+          minLength: 1
+          pattern: ^[a-z_][a-z0-9_-]{0,31}$
+        recursive:
+          type: boolean
+          default: false
+        confirm_protected:
+          type: boolean
+          default: false
+      required:
+      - group
+      - paths
+      - user
+    ContentRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        content:
+          type: string
+          maxLength: 5242880
+        expected_sha256:
+          type: string
+          minLength: 1
+          pattern: ^[0-9a-f]{64}$
+        create_only:
+          type: boolean
+          default: false
+      required:
+      - content
+      - path
     CurrentMetrics:
       type: object
       properties:
@@ -1098,6 +1579,38 @@ components:
           additionalProperties: {}
       required:
       - data
+    DeleteRequest:
+      type: object
+      properties:
+        paths:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 4096
+          maxItems: 1000
+          minItems: 1
+        confirm_protected:
+          type: boolean
+          default: false
+      required:
+      - paths
+    FilesResult:
+      type: object
+      properties:
+        result:
+          type: object
+          additionalProperties: {}
+      required:
+      - result
+    FilesTaskAccepted:
+      type: object
+      properties:
+        task_id:
+          type: string
+          format: uuid
+      required:
+      - task_id
     Health:
       type: object
       properties:
@@ -1404,6 +1917,15 @@ components:
           $ref: '#/components/schemas/CalendarEnum'
         theme:
           $ref: '#/components/schemas/ThemeEnum'
+    PathRequest:
+      type: object
+      properties:
+        path:
+          type: string
+          minLength: 1
+          maxLength: 4096
+      required:
+      - path
     ProcessDetail:
       type: object
       properties:
@@ -1434,6 +1956,18 @@ components:
             type: string
       required:
       - recovery_codes
+    RecycleIdsRequest:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            pattern: ^[0-9a-f]{32}$
+        all:
+          type: boolean
+          default: false
     ResultEnum:
       enum:
       - success
@@ -1540,6 +2074,20 @@ components:
           format: date-time
       required:
       - sudo_until
+    SymlinkRequest:
+      type: object
+      properties:
+        target:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        link:
+          type: string
+          minLength: 1
+          maxLength: 4096
+      required:
+      - link
+      - target
     SystemInfo:
       type: object
       properties:
@@ -1725,6 +2273,82 @@ components:
       - otpauth_uri
       - qr_svg
       - secret
+    TransferRequest:
+      type: object
+      properties:
+        sources:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 4096
+          maxItems: 1000
+          minItems: 1
+        destination:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        rename:
+          type: boolean
+          default: false
+        overwrite:
+          type: boolean
+          default: false
+        confirm_protected:
+          type: boolean
+          default: false
+      required:
+      - destination
+      - sources
+    UploadCreateRequest:
+      type: object
+      properties:
+        directory:
+          type: string
+          minLength: 1
+          maxLength: 4096
+        filename:
+          type: string
+          minLength: 1
+          maxLength: 255
+        size:
+          type: integer
+          minimum: 0
+        overwrite:
+          type: boolean
+          default: false
+      required:
+      - directory
+      - filename
+      - size
+    UploadStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        destination:
+          type: string
+        size:
+          type: integer
+        chunk_size:
+          type: integer
+        total_chunks:
+          type: integer
+        received:
+          type: array
+          items:
+            type: integer
+        completed:
+          type: boolean
+      required:
+      - chunk_size
+      - completed
+      - destination
+      - id
+      - received
+      - size
+      - total_chunks
     User:
       type: object
       properties:

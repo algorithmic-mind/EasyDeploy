@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.monitoring",
     "apps.dashboard",
     "apps.host",
+    "apps.files",
 ]
 
 MIDDLEWARE = [
@@ -212,6 +213,8 @@ EASYDEPLOY = {
     "AGENT_URL": CFG.agent_url,
     "AGENT_TIMEOUT": 30.0,
     "TASK_LOG_DIR": CFG.log_dir / "tasks",
+    "UPLOAD_DIR": CFG.tmp_dir
+    / "uploads",  # the agent joins chunks from here (fs_safety.UPLOAD_ROOT)
     "FRONTEND_DIR": CFG.frontend_dir,
     "DATA_DIR": CFG.data_dir,
     "AGENT_TOKEN": CFG.agent_token,  # dev/test only

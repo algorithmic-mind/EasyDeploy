@@ -3,6 +3,7 @@
 Endpoints (§5.3):
     GET  /v1/health
     GET  /v1/ops                    registry listing with JSON schemas
+    GET  /v1/files/download?path=   raw file bytes (bearer token)
     POST /v1/ops/{op_name}          {"ok": true, "result": {...}} | {"ok": false, "error": {...}}
     POST /v1/ops/{op_name}/stream   NDJSON events: log, progress, result, error
     WS   /v1/pty                    (Phase 1, terminal)
@@ -13,7 +14,7 @@ from __future__ import annotations
 import json
 import queue
 import threading
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from typing import Any
 
 import structlog
@@ -28,6 +29,7 @@ from easydeploy_agent.errors import OpError
 from easydeploy_agent.executor import Executor
 from easydeploy_agent.locks import LockManager
 from easydeploy_agent.registry import OpContext, Registry
+from easydeploy_agent.validators.path import normalize_path
 
 log = structlog.get_logger(__name__)
 
@@ -87,6 +89,36 @@ def create_app(
     @app.get("/v1/health")
     async def health() -> dict[str, Any]:
         return {"ok": True, "result": {"status": "ok", "executor": executor.name}}
+
+    @app.get("/v1/files/download")
+    async def download(request: Request, path: str) -> StreamingResponse:
+        """Raw bytes of one file (the API proxies this to the browser)."""
+        auth.check_bearer(request.headers.get("authorization"))
+        try:
+            clean = normalize_path(path)
+        except ValueError as exc:
+            raise OpError("agent.invalid_params", str(exc)) from None
+        st = await run_in_threadpool(executor.stat, clean)
+        handle = await run_in_threadpool(executor.open_read, clean)
+        audit.write(
+            op="fs.download",
+            params={"path": clean},
+            ok=True,
+            duration_ms=0,
+            request_id=request.headers.get("x-request-id"),
+            actor=request.headers.get("x-actor"),
+        )
+
+        def chunks() -> Iterator[bytes]:
+            with handle:
+                while block := handle.read(256 * 1024):
+                    yield block
+
+        return StreamingResponse(
+            chunks(),
+            media_type="application/octet-stream",
+            headers={"Content-Length": str(st.size)},
+        )
 
     @app.get("/v1/ops")
     async def list_ops(request: Request) -> dict[str, Any]:

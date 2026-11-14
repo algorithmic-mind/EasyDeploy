@@ -29,6 +29,7 @@ EASYDEPLOY = {
     **EASYDEPLOY,
     "AGENT_BACKEND": "apps.core.agent_client.FakeAgent",
     "TASK_LOG_DIR": _TMP / "logs" / "tasks",
+    "UPLOAD_DIR": _TMP / "uploads",
     "FRONTEND_DIR": _TMP / "frontend",
     "DATA_DIR": _TMP,
     "AGENT_TOKEN": "test-agent-token-" + "x" * 32,
