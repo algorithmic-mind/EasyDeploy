@@ -312,6 +312,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/monitoring/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description One-shot live metrics (rates relative to the last stored sample). */
+        get: operations["monitoring_current_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/monitoring/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["monitoring_history_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/panel/info": {
         parameters: {
             query?: never;
@@ -498,8 +531,39 @@ export interface components {
          * @enum {string}
          */
         CalendarEnum: "gregorian" | "jalali";
+        CurrentMetrics: {
+            data: {
+                [key: string]: unknown;
+            };
+        };
         Health: {
             status: string;
+        };
+        HistoryPoint: {
+            /** Format: date-time */
+            ts: string;
+            /** Format: double */
+            cpu_percent: number;
+            /** Format: double */
+            load1: number;
+            /** Format: double */
+            mem_used: number;
+            /** Format: double */
+            mem_total: number;
+            /** Format: double */
+            swap_used: number;
+            /** Format: double */
+            swap_total: number;
+            /** Format: double */
+            disk_read_bps: number;
+            /** Format: double */
+            disk_write_bps: number;
+            /** Format: double */
+            net_rx_bps: number;
+            /** Format: double */
+            net_tx_bps: number;
+            /** Format: double */
+            disk_percent: number;
         };
         /**
          * @description * `en` - En
@@ -537,6 +601,10 @@ export interface components {
             /** Format: date-time */
             sudo_until: string | null;
             must_enroll_2fa: boolean;
+        };
+        MetricsHistory: {
+            points: components["schemas"]["HistoryPoint"][];
+            range: string;
         };
         PaginatedApiKeyList: {
             /** @example 123 */
@@ -1236,6 +1304,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
+                };
+            };
+        };
+    };
+    monitoring_current_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentMetrics"];
+                };
+            };
+        };
+    };
+    monitoring_history_retrieve: {
+        parameters: {
+            query?: {
+                range?: "1h" | "24h" | "30d" | "7d";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsHistory"];
                 };
             };
         };

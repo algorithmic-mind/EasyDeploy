@@ -52,7 +52,9 @@ def manage_or_fail(*args: str, input_text: str | None = None) -> str:
     result = manage(*args, input_text=input_text)
     if not result.ok:
         fail(" ".join(args[:1]), result.stderr or result.stdout)
-    return result.stdout.strip()
+    # Commands print their result last; anything before it is incidental output.
+    lines = result.stdout.strip().splitlines()
+    return lines[-1].strip() if lines else ""
 
 
 @app.callback()

@@ -159,6 +159,57 @@ def _ndjson(lines: Iterator[str]) -> Iterator[dict[str, Any]]:
             yield json.loads(line)
 
 
+def _fake_metrics(_params: dict[str, Any]) -> dict[str, Any]:
+    import time
+
+    now = time.time()
+    return {
+        "timestamp": now,
+        "cpu_percent": 12.5,
+        "cpu_per_core": [10.0, 15.0],
+        "load1": 0.3,
+        "load5": 0.2,
+        "load15": 0.1,
+        "memory_total": 2 * 1024**3,
+        "memory_used": 1024**3,
+        "memory_available": 1024**3,
+        "swap_total": 1024**3,
+        "swap_used": 0,
+        "disks": [
+            {
+                "mountpoint": "/",
+                "device": "/dev/sda1",
+                "fstype": "ext4",
+                "total": 40 * 1024**3,
+                "used": 10 * 1024**3,
+                "percent": 25.0,
+            },
+        ],
+        "disk_read_bytes": int(now * 1000),
+        "disk_write_bytes": int(now * 2000),
+        "net": [{"interface": "eth0", "bytes_sent": int(now * 100), "bytes_recv": int(now * 300)}],
+        "top_cpu": [
+            {
+                "pid": 1,
+                "name": "systemd",
+                "username": "root",
+                "cpu_percent": 0.5,
+                "memory_rss": 10 * 1024**2,
+            }
+        ],
+        "top_memory": [
+            {
+                "pid": 1,
+                "name": "systemd",
+                "username": "root",
+                "cpu_percent": 0.5,
+                "memory_rss": 10 * 1024**2,
+            }
+        ],
+        "uptime_seconds": 86_400,
+    }
+
+
 class FakeAgent:
     """In-memory stand-in used by tests and ``seed_demo``. Register handlers per op."""
 
@@ -181,7 +232,8 @@ class FakeAgent:
                 "uptime_seconds": 86_400,
                 "agent_version": "0.1.0",
                 "executor": "fake",
-            }
+            },
+            "system.metrics": _fake_metrics,
         }
         self.available = True
 

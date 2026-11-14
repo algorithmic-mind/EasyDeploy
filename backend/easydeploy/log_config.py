@@ -57,7 +57,8 @@ def configure_logging(level: str = "info", *, json_output: bool = True) -> None:
             "handlers": {
                 "console": {
                     "class": "logging.StreamHandler",
-                    "stream": sys.stdout,
+                    # stderr: journald captures it, and command output on stdout stays clean.
+                    "stream": sys.stderr,
                     "formatter": "structlog",
                 }
             },

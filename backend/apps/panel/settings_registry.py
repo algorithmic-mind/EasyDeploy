@@ -67,6 +67,8 @@ define("security.enforce_2fa", bool, False)
 define("security.login_max_failures", Annotated[int, Field(ge=3, le=50)], 5)
 define("security.login_lockout_minutes", Annotated[int, Field(ge=1, le=1440)], 15)
 define("security.sudo_minutes", Annotated[int, Field(ge=1, le=60)], 10)
+define("monitoring.enabled", bool, True)
+define("monitoring.retention_days", Annotated[int, Field(ge=1, le=365)], 30)
 
 
 class UnknownSetting(KeyError):

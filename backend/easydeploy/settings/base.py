@@ -196,6 +196,11 @@ CELERY_TASK_ROUTES = {
 CELERY_TASK_TIME_LIMIT = 3600
 CELERY_TASK_SOFT_TIME_LIMIT = 3300
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# System jobs; synced into django-celery-beat's tables by the DatabaseScheduler.
+CELERY_BEAT_SCHEDULE = {
+    "monitor-collect": {"task": "monitor.collect", "schedule": 60.0},
+    "monitor-maintenance": {"task": "monitor.maintenance", "schedule": 6 * 3600.0},
+}
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_TIMEZONE = "UTC"
 

@@ -48,7 +48,8 @@ jobs:
           sudo tail -n 100 /var/log/easydeploy/install.log || true
           # Annotations are readable without signing in to GitHub.
           for unit in easydeploy-agent easydeploy-api easydeploy-worker; do
-            msg=$(sudo journalctl -u "$unit" -n 12 --no-pager -o cat 2>/dev/null | tail -c 3000 | tr '\n' '|')
+            msg=$(sudo journalctl -u "$unit" -n 80 --no-pager -o cat 2>/dev/null \
+              | grep -E 'File "|Error|error|Exception' | tail -n 14 | tail -c 3500 | tr '\n' '|')
             echo "::warning title=$unit::$msg"
           done
       - name: Uninstall

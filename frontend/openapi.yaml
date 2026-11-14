@@ -515,6 +515,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/Health'
           description: ''
+  /api/v1/monitoring/current:
+    get:
+      operationId: monitoring_current_retrieve
+      description: One-shot live metrics (rates relative to the last stored sample).
+      tags:
+      - monitoring
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentMetrics'
+          description: ''
+  /api/v1/monitoring/history:
+    get:
+      operationId: monitoring_history_retrieve
+      parameters:
+      - in: query
+        name: range
+        schema:
+          type: string
+          enum:
+          - 1h
+          - 24h
+          - 30d
+          - 7d
+          default: 1h
+      tags:
+      - monitoring
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsHistory'
+          description: ''
   /api/v1/panel/info:
     get:
       operationId: panel_info_retrieve
@@ -871,6 +913,14 @@ components:
       description: |-
         * `gregorian` - Gregorian
         * `jalali` - Jalali
+    CurrentMetrics:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: {}
+      required:
+      - data
     Health:
       type: object
       properties:
@@ -878,6 +928,58 @@ components:
           type: string
       required:
       - status
+    HistoryPoint:
+      type: object
+      properties:
+        ts:
+          type: string
+          format: date-time
+        cpu_percent:
+          type: number
+          format: double
+        load1:
+          type: number
+          format: double
+        mem_used:
+          type: number
+          format: double
+        mem_total:
+          type: number
+          format: double
+        swap_used:
+          type: number
+          format: double
+        swap_total:
+          type: number
+          format: double
+        disk_read_bps:
+          type: number
+          format: double
+        disk_write_bps:
+          type: number
+          format: double
+        net_rx_bps:
+          type: number
+          format: double
+        net_tx_bps:
+          type: number
+          format: double
+        disk_percent:
+          type: number
+          format: double
+      required:
+      - cpu_percent
+      - disk_percent
+      - disk_read_bps
+      - disk_write_bps
+      - load1
+      - mem_total
+      - mem_used
+      - net_rx_bps
+      - net_tx_bps
+      - swap_total
+      - swap_used
+      - ts
     LanguageEnum:
       enum:
       - en
@@ -962,6 +1064,18 @@ components:
       - must_enroll_2fa
       - sudo_until
       - user
+    MetricsHistory:
+      type: object
+      properties:
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryPoint'
+        range:
+          type: string
+      required:
+      - points
+      - range
     PaginatedApiKeyList:
       type: object
       required:

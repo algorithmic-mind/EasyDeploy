@@ -112,3 +112,17 @@ def test_fs_list_missing_dir(ctx: OpContext) -> None:
 def test_sandbox_blocks_escape(sandbox: SandboxExecutor) -> None:
     with pytest.raises(OpError):
         sandbox.local_path("relative")
+
+
+def test_system_metrics_shape(ctx: OpContext) -> None:
+    from easydeploy_agent.protocol.metrics import SystemMetrics
+
+    first = registry.invoke("system.metrics", {}, ctx)
+    second = registry.invoke("system.metrics", {}, ctx)
+    assert isinstance(first, SystemMetrics)
+    assert isinstance(second, SystemMetrics)
+    assert 0 <= second.cpu_percent <= 100
+    assert second.memory_total >= second.memory_used > 0
+    assert len(second.top_memory) <= 5
+    assert all(not n.interface.startswith(("lo", "veth", "docker")) for n in second.net)
+    assert second.disk_read_bytes >= first.disk_read_bytes

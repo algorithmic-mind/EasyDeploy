@@ -99,8 +99,9 @@ REPORT=""
 for unit in easydeploy-agent easydeploy-api easydeploy-worker redis-server; do
   procs="/sys/fs/cgroup/system.slice/$unit.service/cgroup.procs"
   kb=0
-  if [[ -r $procs ]] && [[ -s $procs ]]; then
-    kb=$(ps -o rss= -p "$(paste -sd, "$procs")" | awk '{s += $1} END {print s + 0}')
+  pids=$(paste -sd, "$procs" 2>/dev/null || true)  # cgroup files report size 0; read them
+  if [[ -n $pids ]]; then
+    kb=$(ps -o rss= -p "$pids" | awk '{s += $1} END {print s + 0}')
   fi
   mb=$((kb / 1024))
   TOTAL=$((TOTAL + mb))
