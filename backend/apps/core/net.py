@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ipaddress
+from typing import Any
 
 from django.http import HttpRequest
 
@@ -15,6 +16,19 @@ def client_ip(request: HttpRequest) -> str:
     # Over the Unix socket there is no REMOTE_ADDR; then Nginx's X-Real-IP is authoritative.
     if not remote or remote in trusted:
         forwarded = request.META.get("HTTP_X_REAL_IP", "").strip()
+        if forwarded and _is_ip(forwarded):
+            return forwarded
+    return remote or "unknown"
+
+
+def scope_ip(scope: dict[str, Any]) -> str:
+    """``client_ip`` for an ASGI (WebSocket) scope."""
+    client = scope.get("client")
+    remote = str(client[0]) if client else ""
+    trusted: list[str] = list(ed("TRUSTED_PROXIES", []))
+    if not remote or remote in trusted:
+        headers = dict(scope.get("headers") or [])
+        forwarded = headers.get(b"x-real-ip", b"").decode("latin-1").strip()
         if forwarded and _is_ip(forwarded):
             return forwarded
     return remote or "unknown"

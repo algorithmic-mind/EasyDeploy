@@ -2,10 +2,12 @@
 
 Production talks HTTP over ``/run/easydeploy/agent/agent.sock``; development uses TCP
 (``ED_AGENT_URL``); tests use ``FakeAgent``. Obtain the configured client with ``get_agent()``.
+Terminals use a WebSocket to the agent's ``/v1/pty`` (``open_pty``).
 """
 
 from __future__ import annotations
 
+import asyncio
 import functools
 import json
 from collections.abc import Callable, Iterator
@@ -14,6 +16,8 @@ from typing import Any
 import httpx
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
+from websockets.asyncio.client import ClientConnection, connect, unix_connect
+from websockets.exceptions import ConnectionClosed, InvalidHandshake, InvalidStatus
 
 from apps.core.conf import ed, ed_float, ed_path, ed_str
 from apps.core.errors import EasyDeployError, ServiceUnavailable
@@ -43,6 +47,32 @@ class AgentError(EasyDeployError):
 class AgentUnavailable(ServiceUnavailable):
     code = "agent.unavailable"
     default_message = _("The EasyDeploy agent is not reachable.")
+
+
+class PtyClosed(Exception):
+    """The agent side of a terminal session has ended."""
+
+
+class AgentPty:
+    """One terminal session on the agent (``WS /v1/pty``); frames are passed through as-is."""
+
+    def __init__(self, conn: ClientConnection) -> None:
+        self._conn = conn
+
+    async def send(self, message: str | bytes) -> None:
+        try:
+            await self._conn.send(message)
+        except ConnectionClosed as exc:
+            raise PtyClosed from exc
+
+    async def recv(self) -> str | bytes:
+        try:
+            return await self._conn.recv()
+        except ConnectionClosed as exc:
+            raise PtyClosed from exc
+
+    async def close(self) -> None:
+        await self._conn.close()
 
 
 def _token() -> str:
@@ -173,6 +203,31 @@ class AgentClient:
 
         return chunks(), int(resp.headers.get("content-length", "0"))
 
+    async def open_pty(self, *, actor: str) -> AgentPty:
+        """Connect to the agent's terminal endpoint (bearer + sudo token for ``actor``)."""
+        options: dict[str, Any] = {
+            "additional_headers": self._headers(actor, True),
+            "open_timeout": 5,
+            "max_size": 1024 * 1024,
+            "compression": None,
+        }
+        try:
+            if self.socket_path:
+                conn = await unix_connect(self.socket_path, "ws://agent/v1/pty", **options)
+            else:
+                base = (self.base_url or "").rstrip("/")
+                url = "ws" + base.removeprefix("http") + "/v1/pty"
+                conn = await connect(url, proxy=None, **options)
+        except InvalidStatus as exc:
+            raise AgentError(
+                "The agent refused the terminal session",
+                code="terminal.refused",
+                details={"status": exc.response.status_code},
+            ) from exc
+        except (OSError, InvalidHandshake, TimeoutError) as exc:
+            raise AgentUnavailable(details={"reason": type(exc).__name__}) from exc
+        return AgentPty(conn)
+
     def health(self) -> bool:
         try:
             with self._client(5.0) as client:
@@ -238,6 +293,44 @@ def _fake_metrics(_params: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+class FakePty:
+    """Echo terminal used with ``FakeAgent``: mirrors the agent's dry-run session."""
+
+    def __init__(self) -> None:
+        self.start: dict[str, Any] | None = None
+        self.sent: list[dict[str, Any]] = []
+        self.closed = False
+        self._out: asyncio.Queue[str | bytes | None] = asyncio.Queue()
+
+    async def send(self, message: str | bytes) -> None:
+        if self.closed:
+            raise PtyClosed
+        frame = json.loads(message)
+        self.sent.append(frame)
+        if self.start is None:
+            self.start = frame
+            self._out.put_nowait(json.dumps({"type": "started"}))
+            self._out.put_nowait(b"fake terminal\r\n$ ")
+        elif frame.get("type") == "input":
+            self._out.put_nowait(str(frame["data"]).encode())
+
+    async def recv(self) -> str | bytes:
+        item = await self._out.get()
+        if item is None:
+            raise PtyClosed
+        return item
+
+    def end(self, code: int = 0) -> None:
+        """Simulate the shell exiting."""
+        self._out.put_nowait(json.dumps({"type": "exit", "code": code}))
+        self._out.put_nowait(None)
+
+    async def close(self) -> None:
+        if not self.closed:
+            self.closed = True
+            self._out.put_nowait(None)
+
+
 class FakeAgent:
     """In-memory stand-in used by tests and ``seed_demo``. Register handlers per op."""
 
@@ -265,6 +358,7 @@ class FakeAgent:
         }
         self.available = True
         self.files: dict[str, bytes] = {}  # served by download()
+        self.ptys: list[FakePty] = []
 
     def call(
         self,
@@ -303,6 +397,14 @@ class FakeAgent:
         if data is None:
             raise AgentError("Path does not exist", code="fs.not_found", status_code=404)
         return iter([data]), len(data)
+
+    async def open_pty(self, *, actor: str) -> FakePty:
+        self.calls.append(("pty.open", {}, actor, True))
+        if not self.available:
+            raise AgentUnavailable(details={"reason": "fake_unavailable"})
+        session = FakePty()
+        self.ptys.append(session)
+        return session
 
     def health(self) -> bool:
         return self.available

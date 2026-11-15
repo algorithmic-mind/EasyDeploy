@@ -14,7 +14,7 @@
 | Item | Value |
 |---|---|
 | Current phase | **Phase 1 — Host essentials** (in progress). Phase 0 accepted on GitHub runners (Ubuntu 22.04 + 24.04). |
-| Last updated | 2026-11-14 |
+| Last updated | 2026-11-15 |
 | Last agent | Claude Opus 5.5 (Claude Code) |
 | Git | https://github.com/algorithmic-mind/EasyDeploy (`main`); first release tag `v0.1.0-alpha.1` |
 | Next step | See "Next step" at the bottom |
@@ -43,7 +43,7 @@
 - [x] 1.2 Processes & services: agent `proc.list|detail|signal`, `service.list|action` (critical units protected), pages
 - [x] 1.3 Logs viewers: audit log, login log, task log, system logs (journald, follow). CSV export of audit log: not yet
 - [x] 1.4 Files (§9.9): agent `fs.*` ops (read/write with conflict check, mkdir/move/copy, recycle bin, chmod/chown/symlink, du/search, compress/extract with zip-slip protection, fetch URL), `/v1/files/download`, API with resumable 4 MiB chunked uploads and Task-based long ops, File manager + Recycle bin pages, Monaco editor. Not yet: favorites, folder upload, image preview, zip-on-the-fly folder download (use Compress → Download)
-- [ ] 1.5 Terminal (§9.10): agent `/v1/pty`, `/ws/terminal/`, xterm.js, container exec, snippets, saved SSH hosts (asyncssh)
+- [x] 1.5 Terminal (§9.10): agent `WS /v1/pty` (host login shell as root or a Linux user, `docker exec` with a shell allowlist; echo session in dry-run), API bridge `/ws/terminal/<session>/` (sudo mode, idle timeout `terminal.idle_minutes`, start/end audited), `POST /terminal/check`, snippets CRUD, Terminal page (xterm.js tabs, resize, copy/paste, font size, snippets Insert/Run) + Snippets page. **Saved SSH hosts deferred to Phase 2** (nav shows Phase 2). Not yet: sessions surviving page navigation
 - [ ] 1.6 Containers (§9.3): docker SDK ops, containers/images/networks/volumes/registries, compose stacks, live logs/stats
 - [ ] 1.7 Phase 1 acceptance (2 GB upload with pause/resume, zip-slip rejected, root + container shell, compose stack from editor, charts survive restart, audit of every mutation)
 
@@ -97,10 +97,27 @@ Small decisions taken where the spec is silent (§0). Hard-to-reverse ones get a
 | 2026-11-14 | Critical systemd units: panel units cannot be controlled from the UI (edctl only); nginx/redis/docker/ssh/journald/logind/dbus can be restarted but not stopped/disabled. Processes of panel units, PID 1 and the agent cannot be signalled. | §9.11 "panel-critical units are protected". |
 | 2026-11-14 | Files: recycle bin at `/opt/easydeploy/recycle/<id>/{item,meta.json}`; `NEVER` paths (`/`, `/etc`, `/opt/easydeploy`, …) cannot be deleted/moved; paths under `PROTECTED_ROOTS` need `confirm_protected` (UI asks to type the path). Uploads: API writes chunks to `/opt/easydeploy/tmp/uploads/<id>/NNNNNN.part`, agent `fs.upload_finalize` joins them. Editor saves UTF-8. | §9.9; agent/easydeploy_agent/fs_safety.py |
 | 2026-11-14 | Idle RSS is *measured and reported* in Phase 0 acceptance (annotation), not a pass/fail gate; the ≤ 450 MB target is a Phase 6 gate. | §15 Phase 0 says "measured and recorded"; Phase 6 says "≤ 450 MB". |
+| 2026-11-15 | Terminal: the API bridges the browser WebSocket to the agent's `WS /v1/pty` with the **websockets** client (`unix_connect`; TCP in dev). The agent only takes a typed `PtyStart` (mode, user, container, shell from an allowlist, size) and builds argv itself. Close codes: 4400 bad start, 4403 sudo required, 4408 idle, 4502 agent. | ADR-0023; §5.3 "no raw shell strings". |
+| 2026-11-15 | Terminal idle timeout `terminal.idle_minutes` = 30 (1–1440), counted from the last *input*; sudo mode is checked when a session opens, not continuously. | §9.10 "idle timeout"; open sessions are not cut when sudo expires. |
+| 2026-11-15 | Saved SSH hosts (§9.10) moved to Phase 2 together with the SSH/security module. | §15 Phase 1 deliverable is "Terminal (host + container)". |
+| 2026-11-15 | xterm.js and Monaco CSS are excluded from postcss-rtlcss (`frontend/postcss.config.js`). | In combined mode both `[dir=ltr]` and `[dir=rtl]` variants matched inside `dir="ltr"` islands on RTL pages (xterm measured 1 column). |
 
 ---
 
 ## Change log (newest first)
+
+### 2026-11-15 — Session 1, part 6 (Claude Opus 5.5) — Files and Terminal
+- 1.4 Files: agent `fs.*` ops with recycle bin, protected paths and safe archive extraction; files API with
+  resumable uploads, streamed downloads and task-based long operations; File manager + Recycle bin pages (Monaco).
+- 1.5 Terminal: agent `WS /v1/pty` (`pty_session.py`), `apps/terminal` (Channels consumer bridging to the agent,
+  `POST /terminal/check`, snippets CRUD, audit), `AgentClient.open_pty` / `FakeAgent.open_pty`, setting
+  `terminal.idle_minutes`, `audit.record(ip=…)` and `core.net.scope_ip` for WebSocket audit entries,
+  ADR-0023 (websockets declared as a direct backend dependency), `docs/modules/terminal.md`.
+- Frontend: `modules/terminal` (TerminalView with xterm.js + fit, TerminalPage tabs + snippets panel,
+  SnippetsPage), en/fa strings, navigation entries may carry their own phase (`['ssh_hosts', 2]`).
+- Fixed: postcss-rtlcss broke xterm in RTL (both flipped variants matched inside the LTR island); xterm's
+  off-screen helpers scrolled RTL pages sideways (`overflow: clip`).
+- `.claude/launch.json` (agent / api / web) for the in-app browser preview.
 
 ### 2026-11-14 — Session 1, part 5 (Claude Opus 5.5) — Phase 0 accepted, Phase 1 started
 - Owner asked to "start the remaining phases and complete the project"; working phase by phase.
@@ -179,7 +196,19 @@ Small decisions taken where the spec is silent (§0). Hard-to-reverse ones get a
 
 ## Verification log
 
-Commands run on 2026-11-14 (Windows 11, Python 3.12.16 via uv, Node 24.18):
+Commands run on 2026-11-15 (Windows 11, Python 3.12.16 via uv, Node 24.18) after 1.5 Terminal:
+
+- `.venv/Scripts/python -m pytest agent cli backend` → **244 passed**, 6 skipped (stable over repeated runs;
+  includes `AgentClient.open_pty` against the real agent app over TCP)
+- `ruff check .`, `ruff format --check .`, `mypy agent cli` (strict), `cd backend && mypy .` → clean;
+  `scripts/check_no_shell.py` → OK; `manage.py spectacular --validate --fail-on-warn` → 0 warnings
+- `cd frontend && npm run lint && npm run type-check && npm run test && npm run build` → clean, 18 tests
+- Browser (in-app, Vite + uvicorn + agent `--dev`, Persian RTL, dark): open host terminal, typed input echoed
+  through API → agent, snippet created on the Snippets page and run in the terminal, no horizontal page scroll,
+  `terminal.session_started/ended` and `terminal.snippet_created` in the audit log.
+- **Not run here:** a real PTY / `docker exec` (needs Linux + root): covered by the Phase 1.7 VM acceptance.
+
+Earlier run on 2026-11-14:
 
 - `.venv/Scripts/python -m pytest` → **138 passed**, 6 skipped (skips = public endpoints in the auth-required test)
 - `ruff check .`, `ruff format --check .` → clean · `mypy agent/easydeploy_agent cli/edctl` (strict) → clean ·
@@ -200,10 +229,10 @@ Commands run on 2026-11-14 (Windows 11, Python 3.12.16 via uv, Node 24.18):
 
 ## Not done / known gaps
 
-- Phase 0 VM acceptance (install < 10 min, reboot survival, entrance/lockout/reset-password on a real host) — needs
-  a disposable Ubuntu 24.04 VM: `scripts/vm-test.sh root@<vm-ip>`.
-- CI has never run: the repository has no GitHub remote yet.
-- Idle RSS (≤ 450 MB target) not measured yet (`installer-e2e.yml` prints it).
+- A real reboot of an installed host has not been exercised (GitHub runners cannot reboot).
+- Idle RSS ≈ 695–760 MB, above the ≤ 450 MB Phase 6 target.
+- Terminal: real PTY and `docker exec` only run on Linux as root — not covered by the Windows test run; terminal
+  sessions are lost when navigating away from the Terminal page; saved SSH hosts → Phase 2.
 - Optional self-hosted login captcha after N failures (§9.1) — not built.
 - Signed releases / minisign, bundled lego, offline bundle, `edctl update/rollback`, `upgrade.sh` — Phase 6.
 - `installer/mirrors/ir.env` has no mirror URLs: the owner must fill in trusted mirrors (§11 forbids hardcoding).
@@ -230,9 +259,11 @@ cd frontend && npm install && npm run dev               # terminal 3 → http://
 
 ## Next step
 
-1. Check the `Release` run for `v0.1.0-alpha.1` (build → publish → one-liner verify). If it failed, fix and re-tag
-   (`v0.1.0-alpha.2`).
-2. Continue **Phase 1.4 Files** (§9.9), then 1.5 Terminal, 1.6 Containers, then the Phase 1 acceptance (1.7),
-   extending `scripts/vm-acceptance.sh` and `installer-e2e.yml` for the new checks.
-3. Then Phases 2–6 per §15. Each module: agent ops (+ DryRun/Sandbox tests) → backend app (services, views, audit,
+1. **Phase 1.6 Containers** (§9.3): agent docker ops (Docker SDK via the socket; containers, images, networks,
+   volumes, registries, compose stacks with `docker compose` argv), live logs/stats WebSockets
+   (`/ws/containers/<id>/logs/`), API + pages; the container list links to `/terminal/container-exec?container=<name>`.
+2. Then the Phase 1 acceptance (1.7): extend `scripts/vm-acceptance.sh` and `installer-e2e.yml` (2 GB upload with
+   pause/resume, zip-slip rejected, root + container shell through `/ws/terminal/`, compose stack, charts after restart,
+   audit entries).
+3. Then Phases 2–6 per §15 (Phase 2 also gets the saved SSH hosts of §9.10). Each module: agent ops (+ DryRun/Sandbox tests) → backend app (services, views, audit,
    tests) → frontend page (registered in `modules/pages.ts`, en+fa strings) → docs/modules → PROGRESS → commit.

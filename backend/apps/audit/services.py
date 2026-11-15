@@ -30,7 +30,9 @@ def record(
     result: str = AuditLog.Result.SUCCESS,
     changes: dict[str, Any] | None = None,
     details: dict[str, Any] | None = None,
+    ip: str | None = None,
 ) -> AuditLog:
+    """Write one audit entry; ``ip`` is for callers without an HTTP request (WebSockets)."""
     user = actor
     if user is None and request is not None:
         candidate = getattr(request, "user", None)
@@ -43,7 +45,7 @@ def record(
         module=action.split(".", 1)[0],
         resource_type=resource_type,
         resource_id=str(resource_id),
-        ip=_ip_or_none(client_ip(request)) if request is not None else None,
+        ip=_ip_or_none(client_ip(request)) if request is not None else ip,
         user_agent=request.META.get("HTTP_USER_AGENT", "")[:300] if request is not None else "",
         request_id=current_request_id() or "",
         result=result,

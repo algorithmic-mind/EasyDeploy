@@ -24,5 +24,6 @@
 | [0020](0020-ui-languages-en-fa.md) | UI languages: English and Persian | Accepted |
 | [0021](0021-license-tbd.md) | License (to be decided) | Accepted |
 | [0022](0022-segno-qr-codes.md) | segno for TOTP QR codes | Accepted |
+| [0023](0023-websockets-agent-terminal-client.md) | websockets as the API's client for the agent terminal | Accepted |
 
 New ADRs: copy the structure (Context, Decision, Consequences), next free number.

@@ -23,6 +23,8 @@ dependencies = [
     "segno>=1.6",
     "cryptography>=43",
     "httpx>=0.28",
+    # WebSocket client for the agent terminal (ADR-0023); already pulled in by uvicorn[standard].
+    "websockets>=13",
     "easydeploy-agent",
 ]
 

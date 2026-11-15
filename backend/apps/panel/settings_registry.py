@@ -70,6 +70,7 @@ define("security.sudo_minutes", Annotated[int, Field(ge=1, le=60)], 10)
 define("monitoring.enabled", bool, True)
 define("monitoring.retention_days", Annotated[int, Field(ge=1, le=365)], 30)
 define("files.max_upload_mb", Annotated[int, Field(ge=1, le=102400)], 10240)
+define("terminal.idle_minutes", Annotated[int, Field(ge=1, le=1440)], 30)
 
 
 class UnknownSetting(KeyError):

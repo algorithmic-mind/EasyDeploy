@@ -1,0 +1,52 @@
+{
+  "terminal": {
+    "new_tab": "New terminal",
+    "host_shell": "Host shell",
+    "container_shell": "Container shell",
+    "mode": "Target",
+    "user": "Linux user",
+    "user_hint": "root, or an existing account (the shell runs as a login shell of that user).",
+    "container": "Container name or ID",
+    "container_hint": "The container must be running.",
+    "shell": "Shell",
+    "open": "Open",
+    "font_size": "Font size",
+    "smaller": "Smaller text",
+    "larger": "Larger text",
+    "close_tab": "Close tab",
+    "reconnect": "Reconnect",
+    "copy_hint": "Ctrl+Shift+C copies the selection, Ctrl+Shift+V pastes.",
+    "no_tabs": "No terminal open",
+    "no_tabs_hint": "Open a shell on this server or inside a container. Sudo mode is required.",
+    "status": {
+      "connecting": "Connecting…",
+      "open": "Connected",
+      "exited": "Exited ({code})",
+      "closed": "Disconnected",
+      "error": "Error"
+    },
+    "errors": {
+      "idle_timeout": "The session was closed after being idle.",
+      "invalid_start": "The terminal settings are not valid: {fields}",
+      "refused": "The agent refused the terminal session.",
+      "closed": "The agent closed the terminal.",
+      "agent_unavailable": "The EasyDeploy agent is not reachable.",
+      "sudo": "Sudo mode has expired. Confirm your password and reconnect.",
+      "generic": "The terminal connection failed."
+    },
+    "snippets": "Snippets",
+    "snippets_hint": "Saved commands you can send to the active terminal.",
+    "insert": "Insert",
+    "run": "Run",
+    "manage": "Manage",
+    "no_snippets": "No snippets yet",
+    "add_snippet": "Add snippet",
+    "edit_snippet": "Edit snippet",
+    "name": "Name",
+    "command": "Command",
+    "description": "Description",
+    "delete_snippet": "Delete snippet",
+    "delete_confirm": "Delete the snippet “{name}”?",
+    "search": "Search snippets"
+  }
+}

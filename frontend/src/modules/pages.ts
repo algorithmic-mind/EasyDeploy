@@ -14,4 +14,7 @@ export const PAGES: Record<string, () => Promise<Component>> = {
   '/files/manager': () => import('@/modules/files/pages/FileManagerPage.vue'),
   '/files/recycle-bin': () => import('@/modules/files/pages/RecycleBinPage.vue'),
   '/logs/system': () => import('@/modules/logs/pages/SystemLogsPage.vue'),
+  '/terminal/local': () => import('@/modules/terminal/pages/TerminalPage.vue'),
+  '/terminal/container-exec': () => import('@/modules/terminal/pages/TerminalPage.vue'),
+  '/terminal/snippets': () => import('@/modules/terminal/pages/SnippetsPage.vue'),
 }

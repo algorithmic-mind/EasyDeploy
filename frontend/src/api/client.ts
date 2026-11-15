@@ -22,6 +22,7 @@ export type ApiKeyCreated = S['ApiKeyCreated']
 export type HistoryPoint = S['HistoryPoint']
 export type AuditRow = S['AuditLog']
 export type LoginRow = S['LoginLog']
+export type Snippet = S['Snippet']
 
 export interface FileEntry {
   name: string
@@ -169,6 +170,16 @@ export const filesApi = {
   }) => http.post<S['UploadStatus']>(`${V1}/files/uploads`, body),
   uploadStatus: (id: string) => http.get<S['UploadStatus']>(`${V1}/files/uploads/${id}`),
   completeUpload: (id: string) => http.post<Body>(`${V1}/files/uploads/${id}/complete`),
+}
+
+export const terminalApi = {
+  check: () => http.post<S['TerminalCheck']>(`${V1}/terminal/check`),
+  snippets: (query?: Query) =>
+    http.get<S['PaginatedSnippetList']>(`${V1}/terminal/snippets`, { page_size: 200, ...query }),
+  createSnippet: (body: S['SnippetRequest']) => http.post<Snippet>(`${V1}/terminal/snippets`, body),
+  updateSnippet: (id: string, body: S['PatchedSnippetRequest']) =>
+    http.patch<Snippet>(`${V1}/terminal/snippets/${id}`, body),
+  deleteSnippet: (id: string) => http.delete<void>(`${V1}/terminal/snippets/${id}`),
 }
 
 export const logsApi = {

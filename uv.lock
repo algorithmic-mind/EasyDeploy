@@ -805,6 +805,7 @@ dependencies = [
     { name = "segno" },
     { name = "structlog" },
     { name = "uvicorn", extra = ["standard"] },
+    { name = "websockets" },
 ]
 
 [package.metadata]
@@ -828,6 +829,7 @@ requires-dist = [
     { name = "segno", specifier = ">=1.6" },
     { name = "structlog", specifier = ">=24.4" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
+    { name = "websockets", specifier = ">=13" },
 ]
 
 [[package]]

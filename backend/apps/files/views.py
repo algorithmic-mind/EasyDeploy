@@ -36,9 +36,7 @@ def path_field() -> serializers.CharField:
 class OctetStreamParser(BaseParser):
     media_type = "application/octet-stream"
 
-    def parse(
-        self, stream: Any, media_type: str | None = None, parser_context: Any = None
-    ) -> Any:
+    def parse(self, stream: Any, media_type: str | None = None, parser_context: Any = None) -> Any:
         return bytes(stream.read()) if stream is not None else b""
 
 

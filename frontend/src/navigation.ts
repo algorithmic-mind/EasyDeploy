@@ -15,12 +15,21 @@ export interface NavSection {
   pages: NavPage[]
 }
 
-function section(key: string, icon: string, phase: number, pages: string[]): NavSection {
+/** `pages` entries are page keys, or `[key, phase]` when one page ships later than its section. */
+function section(
+  key: string,
+  icon: string,
+  phase: number,
+  pages: (string | [string, number])[],
+): NavSection {
   const base = `/${key.replace(/_/g, '-')}`
   return {
     key,
     icon,
-    pages: pages.map((page) => ({ key: page, path: `${base}/${page.replace(/_/g, '-')}`, phase })),
+    pages: pages.map((entry) => {
+      const [page, pagePhase] = typeof entry === 'string' ? [entry, phase] : entry
+      return { key: page, path: `${base}/${page.replace(/_/g, '-')}`, phase: pagePhase }
+    }),
   }
 }
 
@@ -47,7 +56,7 @@ export const NAVIGATION: NavSection[] = [
     'settings',
   ]),
   section('files', 'bi-folder2-open', 1, ['manager', 'recycle_bin']),
-  section('terminal', 'bi-terminal', 1, ['local', 'ssh_hosts', 'container_exec', 'snippets']),
+  section('terminal', 'bi-terminal', 1, ['local', ['ssh_hosts', 2], 'container_exec', 'snippets']),
   section('host', 'bi-hdd-rack', 1, [
     'monitoring',
     'processes',

@@ -18,6 +18,7 @@ api_v1: list[URLPattern | URLResolver] = [
     path("monitoring/", include("apps.monitoring.urls")),
     path("host/", include("apps.host.urls")),
     path("files/", include("apps.files.urls")),
+    path("terminal/", include("apps.terminal.urls")),
 ]
 
 urlpatterns = [

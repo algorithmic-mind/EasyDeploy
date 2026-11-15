@@ -1314,6 +1314,179 @@ paths:
               schema:
                 $ref: '#/components/schemas/TaskAccepted'
           description: ''
+  /api/v1/terminal/check:
+    post:
+      operationId: terminal_check_create
+      description: Confirms sudo mode before the UI opens ``/ws/terminal/...`` (a
+        403 triggers the prompt).
+      tags:
+      - terminal
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalCheck'
+          description: ''
+  /api/v1/terminal/snippets:
+    get:
+      operationId: terminal_snippets_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - terminal
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSnippetList'
+          description: ''
+    post:
+      operationId: terminal_snippets_create
+      tags:
+      - terminal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnippetRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snippet'
+          description: ''
+  /api/v1/terminal/snippets/{id}:
+    get:
+      operationId: terminal_snippets_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this snippet.
+        required: true
+      tags:
+      - terminal
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snippet'
+          description: ''
+    put:
+      operationId: terminal_snippets_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this snippet.
+        required: true
+      tags:
+      - terminal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnippetRequest'
+        required: true
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snippet'
+          description: ''
+    patch:
+      operationId: terminal_snippets_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this snippet.
+        required: true
+      tags:
+      - terminal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSnippetRequest'
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snippet'
+          description: ''
+    delete:
+      operationId: terminal_snippets_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this snippet.
+        required: true
+      tags:
+      - terminal
+      security:
+      - apiKeyAuth: []
+      - sessionAuth: []
+      responses:
+        '204':
+          description: No response body
 components:
   schemas:
     ActionEnum:
@@ -1845,6 +2018,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LoginLog'
+    PaginatedSnippetList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Snippet'
     PaginatedTaskList:
       type: object
       required:
@@ -1904,6 +2100,20 @@ components:
       required:
       - current_password
       - new_password
+    PatchedSnippetRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        command:
+          type: string
+          minLength: 1
+          maxLength: 10000
+        description:
+          type: string
+          maxLength: 300
     PatchedUserRequest:
       type: object
       properties:
@@ -2054,6 +2264,53 @@ components:
       required:
       - pid
       - signal
+    Snippet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        command:
+          type: string
+          maxLength: 10000
+        description:
+          type: string
+          maxLength: 300
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - command
+      - created_at
+      - id
+      - name
+      - updated_at
+    SnippetRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        command:
+          type: string
+          minLength: 1
+          maxLength: 10000
+        description:
+          type: string
+          maxLength: 300
+      required:
+      - command
+      - name
     SudoRequest:
       type: object
       properties:
@@ -2240,6 +2497,17 @@ components:
         * `succeeded` - Succeeded
         * `failed` - Failed
         * `cancelled` - Cancelled
+    TerminalCheck:
+      type: object
+      properties:
+        sudo_until:
+          type: number
+          format: double
+        idle_minutes:
+          type: integer
+      required:
+      - idle_minutes
+      - sudo_until
     ThemeEnum:
       enum:
       - light

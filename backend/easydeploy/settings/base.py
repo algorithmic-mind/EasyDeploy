@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "apps.dashboard",
     "apps.host",
     "apps.files",
+    "apps.terminal",
 ]
 
 MIDDLEWARE = [
