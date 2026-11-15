@@ -6,19 +6,23 @@ Endpoints (§5.3):
     GET  /v1/files/download?path=   raw file bytes (bearer token)
     POST /v1/ops/{op_name}          {"ok": true, "result": {...}} | {"ok": false, "error": {...}}
     POST /v1/ops/{op_name}/stream   NDJSON events: log, progress, result, error
-    WS   /v1/pty                    (Phase 1, terminal)
+    WS   /v1/pty                    interactive terminal (bearer + sudo token)
 """
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 import json
+import os
 import queue
 import threading
+import time
 from collections.abc import AsyncIterator, Iterator
 from typing import Any
 
 import structlog
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.concurrency import run_in_threadpool
 
@@ -28,6 +32,7 @@ from easydeploy_agent.auth import Authenticator
 from easydeploy_agent.errors import OpError
 from easydeploy_agent.executor import Executor
 from easydeploy_agent.locks import LockManager
+from easydeploy_agent.pty_session import EchoSession, PtySession, PtyStart
 from easydeploy_agent.registry import OpContext, Registry
 from easydeploy_agent.validators.path import normalize_path
 
@@ -89,6 +94,68 @@ def create_app(
     @app.get("/v1/health")
     async def health() -> dict[str, Any]:
         return {"ok": True, "result": {"status": "ok", "executor": executor.name}}
+
+    @app.websocket("/v1/pty")
+    async def pty(websocket: WebSocket) -> None:
+        """Terminal: {"type":"start",...} then input/resize frames; output as binary frames."""
+        headers = websocket.headers
+        actor = headers.get("x-actor")
+        try:
+            auth.check_bearer(headers.get("authorization"))
+            auth.check_sudo(headers.get("x-sudo-token"), actor)
+        except OpError as exc:
+            await websocket.close(code=4401 if exc.code == "agent.unauthorized" else 4403)
+            return
+        await websocket.accept()
+        try:
+            start = PtyStart.model_validate(await websocket.receive_json())
+            real = executor.name == "real" and os.name == "posix"
+            session: PtySession | EchoSession = PtySession(start) if real else EchoSession(start)
+        except (ValueError, OpError, OSError) as exc:
+            await websocket.send_json({"type": "error", "message": str(exc)[:300]})
+            await websocket.close(code=4400)
+            return
+        opened = time.monotonic()
+        audit.write(
+            op="pty.open",
+            params=start.model_dump(),
+            ok=True,
+            duration_ms=0,
+            request_id=headers.get("x-request-id"),
+            actor=actor,
+        )
+        await websocket.send_json({"type": "started"})
+
+        async def pump() -> None:
+            while (data := await session.read()) is not None:
+                await websocket.send_bytes(data)
+            code = session.close()
+            with contextlib.suppress(Exception):
+                await websocket.send_json({"type": "exit", "code": code})
+                await websocket.close()
+
+        pump_task = asyncio.create_task(pump())
+        try:
+            while True:
+                message = await websocket.receive_json()
+                kind = message.get("type")
+                if kind == "input" and isinstance(message.get("data"), str):
+                    session.write(message["data"][:65536].encode())
+                elif kind == "resize":
+                    session.resize(int(message.get("cols", 80)), int(message.get("rows", 24)))
+        except (WebSocketDisconnect, RuntimeError, ValueError):
+            pass
+        finally:
+            session.close()
+            pump_task.cancel()
+            audit.write(
+                op="pty.close",
+                params={"mode": start.mode},
+                ok=True,
+                duration_ms=(time.monotonic() - opened) * 1000,
+                request_id=headers.get("x-request-id"),
+                actor=actor,
+            )
 
     @app.get("/v1/files/download")
     async def download(request: Request, path: str) -> StreamingResponse:
